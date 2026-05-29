@@ -165,9 +165,77 @@
       padding: 0 12px 12px; display: none; white-space: pre-wrap;
     }
     .faq-item.open .faq-a { display: block; }
+
+    /* ── TELA DE OFERTA ── */
+    #oferta-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.92); display: flex; align-items: center; justify-content: center; z-index: 400; padding: 24px; opacity: 0; pointer-events: none; transition: opacity .5s; }
+    #oferta-overlay.on { opacity: 1; pointer-events: auto; }
+    .oferta-box { background: #161B22; border: 3px solid #E8B500; padding: 36px 28px; width: 100%; max-width: 380px; text-align: center; box-shadow: 0 0 40px rgba(232,181,0,.3); }
+    .oferta-star { font-size: 40px; display: block; margin-bottom: 12px; }
+    .oferta-title { font-family: 'Press Start 2P', monospace; font-size: 10px; color: #E8B500; line-height: 2; margin-bottom: 16px; }
+    .oferta-sub { font-size: 15px; color: #C9D1D9; line-height: 1.7; margin-bottom: 24px; }
+    .oferta-qr { background: #fff; padding: 12px; display: inline-block; margin-bottom: 20px; }
+    .oferta-cta { font-family: 'Press Start 2P', monospace; font-size: 8px; color: #010409; background: #E8B500; padding: 14px 20px; display: inline-block; }
+
+    /* ── TELA DE NOME ── */
+    #name-overlay { position: fixed; inset: 0; background: #0D1117; display: flex; align-items: center; justify-content: center; z-index: 300; padding: 24px; }
+    #name-overlay.hidden { display: none; }
+    .name-box { background: #161B22; border: 2px solid #E8B500; padding: 36px 28px; width: 100%; max-width: 340px; text-align: center; }
+    .name-title { font-family: 'Press Start 2P', monospace; font-size: 9px; color: #E8B500; line-height: 2; margin-bottom: 24px; }
+    .name-sub { font-size: 13px; color: #8B949E; margin-bottom: 20px; line-height: 1.6; }
+    .name-input { width: 100%; background: #0D1117; border: 2px solid #30363D; color: #C9D1D9; padding: 12px; font-size: 16px; outline: none; text-align: center; margin-bottom: 16px; }
+    .name-input:focus { border-color: #E8B500; }
+    .name-btn { width: 100%; padding: 14px; background: #E8B500; color: #010409; border: none; font-family: 'Press Start 2P', monospace; font-size: 9px; cursor: pointer; }
+    .name-btn:hover { opacity: .88; }
+
+    /* ── SAUDAÇÃO NO HEADER ── */
+    .hdr-name { font-family: 'Press Start 2P', monospace; font-size: 7px; color: #E8B500; margin-top: 6px; }
   </style>
 </head>
 <body>
+
+<!-- TELA DE OFERTA -->
+<div id="oferta-overlay">
+  <div class="oferta-box">
+    <span class="oferta-star">🏆</span>
+    <div class="oferta-title">PARABÉNS!</div>
+    <p class="oferta-sub">Você desbloqueou a melhor oferta da<br><strong>Mentoria Fluxo</strong> de todos os tempos!</p>
+    <div class="oferta-qr">
+      <svg viewBox="0 0 21 21" width="160" height="160" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+        <rect width="21" height="21" fill="#fff"/>
+        <!-- finder top-left -->
+        <rect x="0" y="0" width="7" height="7" fill="#000"/><rect x="1" y="1" width="5" height="5" fill="#fff"/><rect x="2" y="2" width="3" height="3" fill="#000"/>
+        <!-- finder top-right -->
+        <rect x="14" y="0" width="7" height="7" fill="#000"/><rect x="15" y="1" width="5" height="5" fill="#fff"/><rect x="16" y="2" width="3" height="3" fill="#000"/>
+        <!-- finder bottom-left -->
+        <rect x="0" y="14" width="7" height="7" fill="#000"/><rect x="1" y="15" width="5" height="5" fill="#fff"/><rect x="2" y="16" width="3" height="3" fill="#000"/>
+        <!-- timing -->
+        <rect x="8" y="6" width="1" height="1" fill="#000"/><rect x="10" y="6" width="1" height="1" fill="#000"/><rect x="12" y="6" width="1" height="1" fill="#000"/>
+        <rect x="6" y="8" width="1" height="1" fill="#000"/><rect x="6" y="10" width="1" height="1" fill="#000"/><rect x="6" y="12" width="1" height="1" fill="#000"/>
+        <!-- data modules -->
+        <rect x="8" y="8" width="2" height="2" fill="#000"/><rect x="11" y="8" width="1" height="1" fill="#000"/><rect x="13" y="8" width="2" height="2" fill="#000"/>
+        <rect x="8" y="11" width="1" height="1" fill="#000"/><rect x="10" y="10" width="3" height="1" fill="#000"/><rect x="9" y="12" width="2" height="2" fill="#000"/>
+        <rect x="12" y="11" width="1" height="3" fill="#000"/><rect x="14" y="10" width="1" height="1" fill="#000"/>
+        <rect x="16" y="9" width="2" height="1" fill="#000"/><rect x="15" y="11" width="1" height="2" fill="#000"/>
+        <rect x="17" y="12" width="1" height="1" fill="#000"/><rect x="14" y="13" width="2" height="1" fill="#000"/>
+        <rect x="8" y="14" width="1" height="1" fill="#000"/><rect x="10" y="15" width="2" height="1" fill="#000"/>
+        <rect x="9" y="16" width="1" height="2" fill="#000"/><rect x="11" y="17" width="3" height="1" fill="#000"/>
+        <rect x="13" y="16" width="1" height="1" fill="#000"/><rect x="15" y="15" width="2" height="2" fill="#000"/>
+        <rect x="17" y="17" width="1" height="1" fill="#000"/><rect x="16" y="19" width="2" height="1" fill="#000"/>
+      </svg>
+    </div>
+    <div class="oferta-cta">QUERO ENTRAR NA MENTORIA →</div>
+  </div>
+</div>
+
+<!-- TELA DE NOME -->
+<div id="name-overlay">
+  <div class="name-box">
+    <div class="name-title">👋 OLÁ!<br>QUAL É O SEU NOME?</div>
+    <p class="name-sub">Para personalizar sua trilha</p>
+    <input class="name-input" type="text" id="nameInput" placeholder="Seu nome..." maxlength="30" autocomplete="off">
+    <button class="name-btn" onclick="saveName()">ENTRAR →</button>
+  </div>
+</div>
 
 <!-- FAQ BUTTON -->
 <button id="faq-btn" onclick="toggleFaq()">
@@ -191,6 +259,7 @@
   </div>
   <div class="prog-bar"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
   <div class="prog-txt" id="progTxt">0 / 24 etapas liberadas</div>
+  <div class="hdr-name" id="hdrName"></div>
 </div>
 
 <!-- NOTICE sem Firebase -->
@@ -315,6 +384,51 @@ function toggleFaq(){
 }
 
 buildFaq();
+
+// ════════════════════════════════════
+//  NOME DO PARTICIPANTE
+// ════════════════════════════════════
+function checkName(){
+  const name = localStorage.getItem('trilha_name');
+  if (name) { applyName(name); }
+  else { document.getElementById('name-overlay').classList.remove('hidden'); }
+  document.getElementById('nameInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') saveName();
+  });
+}
+
+function saveName(){
+  const val = document.getElementById('nameInput').value.trim();
+  if (!val) return;
+  localStorage.setItem('trilha_name', val);
+  applyName(val);
+  document.getElementById('name-overlay').classList.add('hidden');
+}
+
+function applyName(name){
+  const el = document.getElementById('hdrName');
+  if (el) el.textContent = `OI, ${name.toUpperCase()}! 👋`;
+}
+
+// ════════════════════════════════════
+//  SOM DE AVANÇO
+// ════════════════════════════════════
+function playStepSound(){
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    [[523,.0],[659,.12],[784,.24]].forEach(([freq, delay]) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.type = 'sine'; osc.frequency.value = freq;
+      const t = ctx.currentTime + delay;
+      gain.gain.setValueAtTime(0, t);
+      gain.gain.linearRampToValueAtTime(0.25, t + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.35);
+      osc.start(t); osc.stop(t + 0.35);
+    });
+  } catch(e) {}
+}
 
 // ════════════════════════════════════
 //  ⚙ CONFIGURAÇÃO
@@ -648,7 +762,9 @@ async function pullState(){
       }
 
       const newStep = typeof data.step === 'number' ? Math.min(data.step, STEPS.length) : unlocked;
-      if (newStep !== unlocked){ unlocked = newStep; changed = true; }
+      if (newStep !== unlocked){ if (newStep > unlocked) playStepSound(); unlocked = newStep; changed = true; }
+
+      document.getElementById('oferta-overlay').classList.toggle('on', !!data.oferta);
 
       if (data.cps){
         CPS.forEach(cp => {
@@ -697,6 +813,7 @@ window.addEventListener('resize', ()=>{
 });
 
 document.fonts.ready.then(()=>requestAnimationFrame(()=>{
+  checkName();
   buildTrail();
   initCharacter();
   if (isFB){ pullState(); setInterval(pullState, 3000); }

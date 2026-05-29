@@ -185,6 +185,12 @@
         </div>
       </div>
       <div class="card">
+        <div class="card-title">🎁 OFERTA ESPECIAL</div>
+        <button class="ctrl-btn" id="btnOferta" onclick="liberarOferta()" style="width:100%;background:#3FB950;color:#010409;font-size:8px;margin-bottom:10px">🎁 LIBERAR OFERTA</button>
+        <button class="ctrl-btn btn-back" onclick="fecharOferta()" style="width:100%;font-size:7px">✕ FECHAR OFERTA</button>
+        <div id="ofertaStatus" style="font-family:var(--px);font-size:6px;color:var(--muted);margin-top:10px;text-align:center"></div>
+      </div>
+      <div class="card">
         <div class="card-title">LISTA DE ETAPAS — clique para editar checkpoint</div>
         <div class="ctrl-step-list" id="ctrlStepList"></div>
       </div>
@@ -296,10 +302,18 @@ function saveEdit(){
   cp.name=document.getElementById('editName').value.trim();cp.desc=document.getElementById('editDesc').value.trim();cp.link=document.getElementById('editLink').value.trim();
   buildCtrlStepList();pushState();document.getElementById('ctrlSaveOk').classList.add('on');setTimeout(()=>document.getElementById('ctrlSaveOk').classList.remove('on'),2500);
 }
-function buildPayload(){
+function buildPayload(extra){
   const cps={};CPS.forEach(cp=>{if(cp.name||cp.desc||cp.link)cps[String(cp.id)]={name:cp.name,desc:cp.desc,link:cp.link};});
   const titles={};Object.keys(TITLES).forEach(id=>{const def=(STEPS.find(s=>String(s.id)===id)||{}).title;if(TITLES[id]!==def)titles[id]=TITLES[id];});
-  return{steps:STEPS,step:unlocked,cps,...(Object.keys(titles).length?{titles}:{})};
+  return{steps:STEPS,step:unlocked,cps,...(Object.keys(titles).length?{titles}:{}),...(extra||{})};
+}
+async function liberarOferta(){
+  try{const r=await fetch(CFG.firebase.url+CFG.firebase.path,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(buildPayload({oferta:true}))});
+  const s=document.getElementById('ofertaStatus');s.style.color='#3FB950';s.textContent=r.ok?'✓ OFERTA LIBERADA!':'✗ ERRO';}catch(e){document.getElementById('ofertaStatus').textContent='✗ ERRO';}
+}
+async function fecharOferta(){
+  try{const r=await fetch(CFG.firebase.url+CFG.firebase.path,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(buildPayload({oferta:false}))});
+  const s=document.getElementById('ofertaStatus');s.style.color='var(--muted)';s.textContent=r.ok?'Oferta fechada':'';}catch(e){}
 }
 async function pushState(){if(!isFB)return;try{const r=await fetch(CFG.firebase.url+CFG.firebase.path,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(buildPayload())});setSyncLive(r.ok);}catch(e){setSyncLive(false);}}
 async function pullState(){
