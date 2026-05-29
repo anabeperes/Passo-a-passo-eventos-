@@ -448,12 +448,8 @@ function buildTrail(){
       dot.style.cssText = `left:${dotX}px;top:${dotY}px;${isOn?'background:'+t2.c:''}`;
       layer.appendChild(dot);
 
-      const OFFSET = 50 * scale;
-      const lx = dotX + norm.x * OFFSET;
-      const ly = dotY + norm.y * OFFSET;
-
       const emoji = mk('div', 'stop-emoji' + (isOn ? '' : ' off'));
-      emoji.style.cssText = `left:${lx}px;top:${ly}px`;
+      emoji.style.cssText = `left:${dotX}px;top:${dotY}px`;
       emoji.textContent = TE[s.type] || '📌';
       emoji.addEventListener('click', () => openStepSheet(s.id));
       layer.appendChild(emoji);
