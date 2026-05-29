@@ -165,9 +165,33 @@
       padding: 0 12px 12px; display: none; white-space: pre-wrap;
     }
     .faq-item.open .faq-a { display: block; }
+
+    /* ── TELA DE NOME ── */
+    #name-overlay { position: fixed; inset: 0; background: #0D1117; display: flex; align-items: center; justify-content: center; z-index: 300; padding: 24px; }
+    #name-overlay.hidden { display: none; }
+    .name-box { background: #161B22; border: 2px solid #E8B500; padding: 36px 28px; width: 100%; max-width: 340px; text-align: center; }
+    .name-title { font-family: 'Press Start 2P', monospace; font-size: 9px; color: #E8B500; line-height: 2; margin-bottom: 24px; }
+    .name-sub { font-size: 13px; color: #8B949E; margin-bottom: 20px; line-height: 1.6; }
+    .name-input { width: 100%; background: #0D1117; border: 2px solid #30363D; color: #C9D1D9; padding: 12px; font-size: 16px; outline: none; text-align: center; margin-bottom: 16px; }
+    .name-input:focus { border-color: #E8B500; }
+    .name-btn { width: 100%; padding: 14px; background: #E8B500; color: #010409; border: none; font-family: 'Press Start 2P', monospace; font-size: 9px; cursor: pointer; }
+    .name-btn:hover { opacity: .88; }
+
+    /* ── SAUDAÇÃO NO HEADER ── */
+    .hdr-name { font-family: 'Press Start 2P', monospace; font-size: 7px; color: #E8B500; margin-top: 6px; }
   </style>
 </head>
 <body>
+
+<!-- TELA DE NOME -->
+<div id="name-overlay">
+  <div class="name-box">
+    <div class="name-title">👋 OLÁ!<br>QUAL É O SEU NOME?</div>
+    <p class="name-sub">Para personalizar sua trilha</p>
+    <input class="name-input" type="text" id="nameInput" placeholder="Seu nome..." maxlength="30" autocomplete="off">
+    <button class="name-btn" onclick="saveName()">ENTRAR →</button>
+  </div>
+</div>
 
 <!-- FAQ BUTTON -->
 <button id="faq-btn" onclick="toggleFaq()">
@@ -191,6 +215,7 @@
   </div>
   <div class="prog-bar"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
   <div class="prog-txt" id="progTxt">0 / 24 etapas liberadas</div>
+  <div class="hdr-name" id="hdrName"></div>
 </div>
 
 <!-- NOTICE sem Firebase -->
@@ -315,6 +340,51 @@ function toggleFaq(){
 }
 
 buildFaq();
+
+// ════════════════════════════════════
+//  NOME DO PARTICIPANTE
+// ════════════════════════════════════
+function checkName(){
+  const name = localStorage.getItem('trilha_name');
+  if (name) { applyName(name); }
+  else { document.getElementById('name-overlay').classList.remove('hidden'); }
+  document.getElementById('nameInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') saveName();
+  });
+}
+
+function saveName(){
+  const val = document.getElementById('nameInput').value.trim();
+  if (!val) return;
+  localStorage.setItem('trilha_name', val);
+  applyName(val);
+  document.getElementById('name-overlay').classList.add('hidden');
+}
+
+function applyName(name){
+  const el = document.getElementById('hdrName');
+  if (el) el.textContent = `OI, ${name.toUpperCase()}! 👋`;
+}
+
+// ════════════════════════════════════
+//  SOM DE AVANÇO
+// ════════════════════════════════════
+function playStepSound(){
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    [[523,.0],[659,.12],[784,.24]].forEach(([freq, delay]) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.type = 'sine'; osc.frequency.value = freq;
+      const t = ctx.currentTime + delay;
+      gain.gain.setValueAtTime(0, t);
+      gain.gain.linearRampToValueAtTime(0.25, t + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.35);
+      osc.start(t); osc.stop(t + 0.35);
+    });
+  } catch(e) {}
+}
 
 // ════════════════════════════════════
 //  ⚙ CONFIGURAÇÃO
@@ -648,7 +718,7 @@ async function pullState(){
       }
 
       const newStep = typeof data.step === 'number' ? Math.min(data.step, STEPS.length) : unlocked;
-      if (newStep !== unlocked){ unlocked = newStep; changed = true; }
+      if (newStep !== unlocked){ if (newStep > unlocked) playStepSound(); unlocked = newStep; changed = true; }
 
       if (data.cps){
         CPS.forEach(cp => {
@@ -697,6 +767,7 @@ window.addEventListener('resize', ()=>{
 });
 
 document.fonts.ready.then(()=>requestAnimationFrame(()=>{
+  checkName();
   buildTrail();
   initCharacter();
   if (isFB){ pullState(); setInterval(pullState, 3000); }
