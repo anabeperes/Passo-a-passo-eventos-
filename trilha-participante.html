@@ -59,6 +59,11 @@
     .stop-label.off .stop-name { color: var(--muted); }
     .stop-label.stop-clickable:hover { border-color: var(--acc); background: var(--bg2); }
 
+    /* ── STOP EMOJI ── */
+    .stop-emoji { position: absolute; transform: translate(-50%,-50%); font-size: 22px; z-index: 3; pointer-events: auto; cursor: pointer; user-select: none; transition: transform .15s; }
+    .stop-emoji:hover { transform: translate(-50%,-50%) scale(1.25); }
+    .stop-emoji.off { opacity: .3; }
+
     /* ── CHECKPOINT ── */
     .cp-item { position: absolute; z-index: 5; pointer-events: auto; }
     .cp-sq {
@@ -348,6 +353,10 @@ const TC = {
   Planilha: { c:"#39D4C5", bg:"#002D2A" },
   Prompt:   { c:"#F778BA", bg:"#3D0A22" },
 };
+const TE = {
+  PDF:'📄', Aula:'🎓', Doc:'📝', Site:'🌐',
+  Skill:'⚡', Planilha:'📊', Prompt:'💬',
+};
 
 // ════════════════════════════════════
 //  STATE
@@ -401,6 +410,7 @@ function buildTrail(){
   layer.innerHTML = '';
 
   const N = STEPS.length * 2 + 1;
+  let inicioSx = 0, inicioSy = 0;
 
   for (let i = 0; i < N; i++){
     const t    = (i / (N-1)) * total;
@@ -410,6 +420,7 @@ function buildTrail(){
     const sy   = pt.y * scale;
 
     if (i === 0){
+      inicioSx = sx; inicioSy = sy;
       const el = mk('div','trail-flag');
       el.style.cssText = `left:${sx}px;top:${sy}px`;
       el.innerHTML = `<span class="flag-txt">INÍCIO</span>`;
@@ -424,28 +435,28 @@ function buildTrail(){
 
     } else if (i % 2 === 1){
       // ── STOP ──
-      const si  = Math.floor(i/2);
-      const s   = STEPS[si];
-      const t2  = TC[s.type] || {c:'#999',bg:'#222'};
+      const si   = Math.floor(i/2);
+      const s    = STEPS[si];
+      const t2   = TC[s.type] || {c:'#999',bg:'#222'};
       const isOn = si < unlocked;
 
+      // 1º stop coincide com o ponto de INÍCIO
+      const dotX = si === 0 ? inicioSx : sx;
+      const dotY = si === 0 ? inicioSy : sy;
+
       const dot = mk('div', 'stop-dot' + (isOn ? '' : ' off'));
-      dot.style.cssText = `left:${sx}px;top:${sy}px;${isOn?'background:'+t2.c:''}`;
+      dot.style.cssText = `left:${dotX}px;top:${dotY}px;${isOn?'background:'+t2.c:''}`;
       layer.appendChild(dot);
 
       const OFFSET = 50 * scale;
-      const lx = sx + norm.x * OFFSET;
-      const ly = sy + norm.y * OFFSET;
-      const canClick = isOn && !!s.text;
-      const label = mk('div','stop-label'+(isOn?'':' off')+(canClick?' stop-clickable':''));
-      label.style.cssText = `left:${lx}px;top:${ly}px${canClick?';pointer-events:auto;cursor:pointer':''}`;
-      label.innerHTML =
-        `<span class="stop-num">${String(s.id).padStart(2,'0')}</span>`+
-        `<span class="stop-badge" style="background:${isOn?t2.bg:'#1A1E26'};color:${isOn?t2.c:'#484F58'}">${esc(s.type.toUpperCase())}</span>`+
-        `<div class="stop-name">${esc(getTitle(s.id))}</div>`+
-        (canClick ? `<div style="font-size:8px;color:${t2.c};margin-top:3px;text-align:center">▼</div>` : '');
-      if (canClick) label.addEventListener('click', () => openStepSheet(s.id));
-      layer.appendChild(label);
+      const lx = dotX + norm.x * OFFSET;
+      const ly = dotY + norm.y * OFFSET;
+
+      const emoji = mk('div', 'stop-emoji' + (isOn ? '' : ' off'));
+      emoji.style.cssText = `left:${lx}px;top:${ly}px`;
+      emoji.textContent = TE[s.type] || '📌';
+      emoji.addEventListener('click', () => openStepSheet(s.id));
+      layer.appendChild(emoji);
 
     } else {
       // ── CHECKPOINT ──
@@ -552,6 +563,14 @@ function initCharacter(){
   if (document.getElementById('trail-char')) return;
   const wrap = document.createElement('div');
   wrap.id = 'trail-char';
+  wrap.style.pointerEvents = 'auto';
+  wrap.style.cursor = 'pointer';
+  wrap.title = 'Clique para ver onde estamos';
+  wrap.addEventListener('click', () => {
+    if (STEPS.length === 0) return;
+    const idx = unlocked > 0 ? Math.min(unlocked - 1, STEPS.length - 1) : 0;
+    openStepSheet(STEPS[idx].id);
+  });
   const inner = document.createElement('div');
   inner.className = 'char-inner';
   inner.innerHTML = CHAR_SVG;
