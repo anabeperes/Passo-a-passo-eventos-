@@ -575,8 +575,19 @@ function initCharacter(){
   wrap.title = 'Clique para ver onde estamos';
   wrap.addEventListener('click', () => {
     if (STEPS.length === 0) return;
-    const idx = unlocked > 0 ? Math.min(unlocked - 1, STEPS.length - 1) : 0;
-    openStepSheet(STEPS[idx].id);
+    if (unlocked === 0) {
+      activeSheet = null;
+      document.getElementById('sheetLbl').textContent = '🚀 PREPARADOS?';
+      const d = document.getElementById('sheetDesc');
+      d.className = 'sheet-desc';
+      d.textContent = 'Vamos começar já!';
+      document.getElementById('sheetLink').style.display = 'none';
+      document.getElementById('sheetBg').classList.add('on');
+      document.getElementById('sheet').classList.add('on');
+    } else {
+      const idx = Math.min(unlocked - 1, STEPS.length - 1);
+      openStepSheet(STEPS[idx].id);
+    }
   });
   const inner = document.createElement('div');
   inner.className = 'char-inner';
