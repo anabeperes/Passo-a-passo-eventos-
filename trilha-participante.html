@@ -456,15 +456,16 @@ function buildTrail(){
       const cp     = CPS.find(c=>c.id===cpId) || {desc:'',link:''};
       const locked = unlocked < cpId;
 
-      const wrap = mk('div','cp-item');
-      wrap.style.cssText = `left:${sx}px;top:${sy}px`;
-
-      const sq = mk('div',`cp-sq${locked?' cp-lock':''}${cp.desc?' has-c':''}`);
-      sq.innerHTML = `<span class="cp-ico">${locked?'🔒':(cp.desc?'▼':'+')}</span>`;
-      if (!locked) sq.addEventListener('click', ()=>openSheet(cpId));
-
-      wrap.appendChild(sq);
-      layer.appendChild(wrap);
+      // só exibe o checkpoint se tiver conteúdo preenchido
+      if (cp.desc){
+        const wrap = mk('div','cp-item');
+        wrap.style.cssText = `left:${sx}px;top:${sy}px`;
+        const sq = mk('div',`cp-sq${locked?' cp-lock':' has-c'}`);
+        sq.innerHTML = `<span class="cp-ico">▼</span>`;
+        if (!locked) sq.addEventListener('click', ()=>openSheet(cpId));
+        wrap.appendChild(sq);
+        layer.appendChild(wrap);
+      }
     }
   }
 }
