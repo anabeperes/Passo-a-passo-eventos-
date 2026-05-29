@@ -218,7 +218,7 @@ function doLogin(){
 function doLogout(){document.getElementById('login-screen').classList.remove('hidden');document.getElementById('app').classList.remove('on');document.getElementById('passInput').value='';}
 document.addEventListener('keydown',e=>{if(e.key==='Enter'&&!document.getElementById('login-screen').classList.contains('hidden'))doLogin();});
 function switchTab(id){['cfg','ctrl'].forEach(t=>{document.getElementById('tab-'+t).classList.toggle('active',t===id);document.getElementById('tab-'+t+'-btn').classList.toggle('active',t===id);});document.getElementById('saveBar').classList.toggle('visible',id==='cfg');}
-function renderConfig(){
+function renderConfig(skipDirty){
   const n=STEPS.length;
   document.getElementById('cfgStepCount').textContent=`${n} etapa${n!==1?'s':''}`;
   const list=document.getElementById('cfgStepList');list.innerHTML='';
@@ -229,7 +229,7 @@ function renderConfig(){
     row.innerHTML=`<div class="cfg-row-top"><span class="step-num">${String(idx+1).padStart(2,'0')}</span><div class="type-preview" style="background:${color}"></div><select class="type-select" data-idx="${idx}" onchange="cfgChangeType(this)">${typeOpts}</select><input class="name-input" type="text" data-idx="${idx}" value="${esc(s.title)}" placeholder="Nome da etapa..." oninput="cfgChangeName(this)" maxlength="80"><button class="row-btn" onclick="moveUp(${idx})" ${idx===0?'disabled':''}>↑</button><button class="row-btn" onclick="moveDown(${idx})" ${idx===n-1?'disabled':''}>↓</button><button class="row-btn del" onclick="deleteStep(${idx})">✕</button></div><label class="text-lbl">TEXTO DA ETAPA</label><textarea class="text-input" data-idx="${idx}" placeholder="Descreva o que o participante deve fazer..." oninput="cfgChangeText(this)">${esc(s.text||'')}</textarea>`;
     list.appendChild(row);
   });
-  markDirty();
+  if(!skipDirty) markDirty();
 }
 function addStep(){STEPS.push({id:Date.now(),type:'PDF',title:'',text:''});renderConfig();setTimeout(()=>{const i=document.querySelectorAll('#cfgStepList .name-input');if(i.length)i[i.length-1].focus();},50);}
 function cfgChangeType(sel){const i=+sel.dataset.idx;STEPS[i].type=sel.value;renderConfig();}
@@ -310,7 +310,7 @@ async function pullState(){
     // não sobrescreve etapas se houver alterações não salvas
     if(!dirty){
       if(Array.isArray(fbData.steps)&&fbData.steps.length>0){STEPS=fbData.steps.map(s=>({id:s.id,type:s.type||'PDF',title:s.title||'',text:s.text||''}));CPS=STEPS.map(s=>{const ex=CPS.find(c=>c.id===s.id);return ex||{id:s.id,name:'',desc:'',link:''};});}
-      renderConfig();
+      renderConfig(true); // skipDirty: não marca dirty ao carregar do Firebase
     }
     if(typeof fbData.step==='number')unlocked=Math.min(fbData.step,STEPS.length);
     if(fbData.cps)CPS.forEach(cp=>{const rem=fbData.cps[String(cp.id)];if(rem){cp.name=rem.name||'';cp.desc=rem.desc||'';cp.link=rem.link||'';}});
