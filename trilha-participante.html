@@ -447,7 +447,10 @@ function buildTrail(){
       const emoji = mk('div', 'stop-emoji' + (isOn ? '' : ' off'));
       emoji.style.cssText = `left:${sx}px;top:${sy}px`;
       emoji.textContent = TE[s.type] || '📌';
-      emoji.addEventListener('click', () => openStepSheet(s.id));
+      emoji.addEventListener('click', () => {
+        if (isOn) openStepSheet(s.id);
+        else openLockedMsg();
+      });
       layer.appendChild(emoji);
 
     } else {
@@ -522,6 +525,17 @@ function closeSheet(){
   document.getElementById('sheetBg').classList.remove('on');
   document.getElementById('sheet').classList.remove('on');
   activeSheet = null;
+}
+
+function openLockedMsg(){
+  activeSheet = null;
+  document.getElementById('sheetLbl').textContent = '🔒 ETAPA BLOQUEADA';
+  const d = document.getElementById('sheetDesc');
+  d.className = 'sheet-desc';
+  d.textContent = 'Calma, não chegamos aqui ainda!';
+  document.getElementById('sheetLink').style.display = 'none';
+  document.getElementById('sheetBg').classList.add('on');
+  document.getElementById('sheet').classList.add('on');
 }
 
 // ════════════════════════════════════
