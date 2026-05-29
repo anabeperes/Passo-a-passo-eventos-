@@ -307,11 +307,15 @@ async function pullState(){
   try{
     const r=await fetch(CFG.firebase.url+CFG.firebase.path+'?_='+Date.now());if(!r.ok)throw 0;
     const data=await r.json();setSyncLive(true);fbData=data&&typeof data==='object'?data:{};
-    if(Array.isArray(fbData.steps)&&fbData.steps.length>0){STEPS=fbData.steps.map(s=>({id:s.id,type:s.type||'PDF',title:s.title||'',text:s.text||''}));CPS=STEPS.map(s=>{const ex=CPS.find(c=>c.id===s.id);return ex||{id:s.id,name:'',desc:'',link:''};});}
+    // não sobrescreve etapas se houver alterações não salvas
+    if(!dirty){
+      if(Array.isArray(fbData.steps)&&fbData.steps.length>0){STEPS=fbData.steps.map(s=>({id:s.id,type:s.type||'PDF',title:s.title||'',text:s.text||''}));CPS=STEPS.map(s=>{const ex=CPS.find(c=>c.id===s.id);return ex||{id:s.id,name:'',desc:'',link:''};});}
+      renderConfig();
+    }
     if(typeof fbData.step==='number')unlocked=Math.min(fbData.step,STEPS.length);
     if(fbData.cps)CPS.forEach(cp=>{const rem=fbData.cps[String(cp.id)];if(rem){cp.name=rem.name||'';cp.desc=rem.desc||'';cp.link=rem.link||'';}});
     if(fbData.titles)Object.keys(fbData.titles).forEach(id=>{TITLES[id]=fbData.titles[id];});
-    renderConfig();renderCtrl();
+    renderCtrl();
   }catch(e){setSyncLive(false);}
 }
 function setSyncLive(live){syncLive=live;document.getElementById('syncDot').classList.toggle('live',live);document.getElementById('syncTxt').textContent=live?'AO VIVO':'OFFLINE';}
