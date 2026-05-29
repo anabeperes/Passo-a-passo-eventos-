@@ -3,29 +3,48 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Passo a Passo — Eventos</title>
+<title>Seu Mapa do Evento</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { background: #0D1117; color: #C9D1D9; font-family: 'Press Start 2P', monospace; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; gap: 40px; }
-  h1 { color: #E8B500; font-size: 1rem; text-align: center; line-height: 1.8; }
-  .cards { display: flex; gap: 24px; flex-wrap: wrap; justify-content: center; }
-  a.card { display: flex; flex-direction: column; align-items: center; gap: 16px; background: #161B22; border: 2px solid #30363D; border-radius: 12px; padding: 32px 40px; text-decoration: none; color: #C9D1D9; transition: border-color .2s, transform .2s; font-size: .65rem; text-align: center; line-height: 1.8; }
-  a.card:hover { border-color: #E8B500; transform: translateY(-4px); }
-  .icon { font-size: 2.5rem; }
+  body { background: #0D1117; color: #C9D1D9; font-family: 'Press Start 2P', monospace; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 24px; }
+
+  .hero { text-align: center; margin-bottom: 48px; }
+  h1 { color: #E8B500; font-size: 1.4rem; line-height: 1.8; margin-bottom: 16px; }
+  .sub { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 16px; color: #8B949E; line-height: 1.6; }
+
+  a.main-card {
+    display: flex; flex-direction: column; align-items: center; gap: 20px;
+    background: #161B22; border: 2px solid #E8B500; border-radius: 16px;
+    padding: 52px 80px; text-decoration: none; color: #C9D1D9;
+    transition: transform .2s, box-shadow .2s;
+    font-size: .75rem; text-align: center; line-height: 1.8;
+    box-shadow: 0 0 30px rgba(232,181,0,.15);
+  }
+  a.main-card:hover { transform: translateY(-6px); box-shadow: 0 0 50px rgba(232,181,0,.3); }
+  .main-icon { font-size: 4rem; }
+
+  a.admin-btn {
+    position: fixed; bottom: 20px; left: 20px;
+    background: #161B22; border: 1px solid #30363D; border-radius: 8px;
+    padding: 10px 12px; text-decoration: none;
+    font-size: 20px; line-height: 1;
+    opacity: .4; transition: opacity .2s;
+  }
+  a.admin-btn:hover { opacity: 1; }
 </style>
 </head>
 <body>
-  <h1>PASSO A PASSO<br>EVENTOS</h1>
-  <div class="cards">
-    <a class="card" href="/trilha-participante.html">
-      <span class="icon">🗺️</span>
-      TRILHA<br>PARTICIPANTE
-    </a>
-    <a class="card" href="/trilha-admin.html">
-      <span class="icon">⚙️</span>
-      PAINEL<br>ADMIN
-    </a>
+  <div class="hero">
+    <h1>SEU MAPA<br>DO EVENTO</h1>
+    <p class="sub">acompanhe em tempo real o que já fizemos e onde estamos</p>
   </div>
+
+  <a class="main-card" href="/trilha-participante.html">
+    <span class="main-icon">🗺️</span>
+    ABRIR TRILHA
+  </a>
+
+  <a class="admin-btn" href="/trilha-admin.html" title="Painel Admin">⚙️</a>
 </body>
 </html>
