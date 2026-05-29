@@ -602,7 +602,7 @@ function updateCharacter(animate = true){
   if (!char) return;
   const path  = document.getElementById('road-path');
   const total = path.getTotalLength();
-  const N     = 49;
+  const N     = STEPS.length * 2 + 1;
   const scale = getScale();
 
   const idx = unlocked === 0 ? 0 : Math.min(2 * unlocked - 1, N - 2);
