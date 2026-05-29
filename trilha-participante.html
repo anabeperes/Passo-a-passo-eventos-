@@ -409,18 +409,18 @@ function buildTrail(){
   const scale = getScale();
   layer.innerHTML = '';
 
+  // Usamos N+2 pontos: posição 0 = INÍCIO, posição N+1 = CHEGADA,
+  // posições 1..N = stops e checkpoints intercalados, SEM parada no INÍCIO.
   const N = STEPS.length * 2 + 1;
-  let inicioSx = 0, inicioSy = 0;
 
   for (let i = 0; i < N; i++){
     const t    = (i / (N-1)) * total;
     const pt   = path.getPointAtLength(t);
-    const norm = leftNormal(path, t);
     const sx   = pt.x * scale;
     const sy   = pt.y * scale;
 
     if (i === 0){
-      inicioSx = sx; inicioSy = sy;
+      // Só texto INÍCIO — sem dot nem emoji
       const el = mk('div','trail-flag');
       el.style.cssText = `left:${sx}px;top:${sy}px`;
       el.innerHTML = `<span class="flag-txt">INÍCIO</span>`;
@@ -434,22 +434,18 @@ function buildTrail(){
       layer.appendChild(el);
 
     } else if (i % 2 === 1){
-      // ── STOP ──
+      // ── STOP — posicionado no centro da estrada ──
       const si   = Math.floor(i/2);
       const s    = STEPS[si];
       const t2   = TC[s.type] || {c:'#999',bg:'#222'};
       const isOn = si < unlocked;
 
-      // 1º stop coincide com o ponto de INÍCIO
-      const dotX = si === 0 ? inicioSx : sx;
-      const dotY = si === 0 ? inicioSy : sy;
-
       const dot = mk('div', 'stop-dot' + (isOn ? '' : ' off'));
-      dot.style.cssText = `left:${dotX}px;top:${dotY}px;${isOn?'background:'+t2.c:''}`;
+      dot.style.cssText = `left:${sx}px;top:${sy}px;${isOn?'background:'+t2.c:''}`;
       layer.appendChild(dot);
 
       const emoji = mk('div', 'stop-emoji' + (isOn ? '' : ' off'));
-      emoji.style.cssText = `left:${dotX}px;top:${dotY}px`;
+      emoji.style.cssText = `left:${sx}px;top:${sy}px`;
       emoji.textContent = TE[s.type] || '📌';
       emoji.addEventListener('click', () => openStepSheet(s.id));
       layer.appendChild(emoji);
