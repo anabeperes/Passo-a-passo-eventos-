@@ -558,7 +558,7 @@ function buildTrail(){
       dot.style.cssText = `left:${sx}px;top:${sy}px;${isOn?'background:'+t2.c:''}`;
       layer.appendChild(dot);
 
-      const emoji = mk('div', 'stop-emoji' + (isOn ? '' : ' off'));
+      const emoji = mk('div', 'stop-emoji');
       emoji.style.cssText = `left:${sx}px;top:${sy}px`;
       emoji.textContent = TE[s.type] || '📌';
       emoji.addEventListener('click', () => {
