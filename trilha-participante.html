@@ -171,11 +171,11 @@
     /* ── TRAIL ── */
     .road-wrap {
       position: relative; max-width: 500px; margin: 0 auto;
-      padding: 12px 0 24px; z-index: 1; overflow: visible;
+      padding: 180px 0 24px; z-index: 1; overflow: visible;
     }
     #road-svg { display: block; width: 100%; height: auto; overflow: visible; }
-    #items-layer { position: absolute; top: 12px; left: 0; width: 100%; pointer-events: none; overflow: visible; }
-    #char-layer  { position: absolute; top: 12px; left: 0; width: 100%; pointer-events: none; overflow: visible; z-index: 10; }
+    #items-layer { position: absolute; top: 180px; left: 0; width: 100%; pointer-events: none; overflow: visible; }
+    #char-layer  { position: absolute; top: 180px; left: 0; width: 100%; pointer-events: none; overflow: visible; z-index: 10; }
 
     /* ── MARKER: START/END ── */
     .marker-pill {
@@ -984,6 +984,10 @@ function updateCharacters(animate = true){
     inner.classList.remove('pop');
     void inner.offsetWidth;
     inner.classList.add('pop');
+    // scroll suave para acompanhar o Leandro após a transição CSS (900ms)
+    setTimeout(() => {
+      char.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 950);
   }
 }
 
