@@ -623,7 +623,7 @@ function renderFaqAnswer(raw){
       '<a href="#" onclick="scrollToLeandro();return false;" style="color:#00C8D4;text-decoration:underline;font-weight:bold">clique na SEREIA</a> para ir até onde estamos agora.')
     .replace(/__VOLTAR__/g,
       `<a href="${CFG.backUrl}" style="color:#00C8D4;text-decoration:underline">voltar ao evento</a>`)
-    .replace(/__LINK__([^_]+)__([^/]+)\/LINK__/g,
+    .replace(/__LINK__([^_]+)__(.+?)\/LINK__/g,
       '<a href="$1" target="_blank" rel="noopener" style="color:#00C8D4;text-decoration:underline">$2</a>');
 }
 
