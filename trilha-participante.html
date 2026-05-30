@@ -281,7 +281,7 @@
     }
     .char-badge {
       position: absolute;
-      top: -118px; left: 50%;
+      top: -12px; left: 50%;
       transform: translateX(-50%);
       font-family: 'Press Start 2P', monospace; font-size: 6px;
       padding: 3px 7px;
@@ -290,6 +290,8 @@
     }
     .char-badge.leandro { background: #00C8D4; color: #010810; box-shadow: 0 0 10px rgba(0,200,212,.5); }
     .char-badge.ruy     { background: #56D364; color: #010810; box-shadow: 0 0 10px rgba(86,211,100,.45); }
+    .char-img { display: block; height: 160px; width: auto; object-fit: contain; }
+    .char-img.ruy { height: 150px; }
 
     /* ── BOTTOM SHEET ── */
     .sheet-bg { position: fixed; inset: 0; background: rgba(0,5,15,.75); display: none; z-index: 150; backdrop-filter: blur(3px); }
@@ -867,113 +869,10 @@ function closeSheet(){
 }
 
 // ════════════════════════════════════
-//  PERSONAGEM — SVG pixel art
+//  PERSONAGENS — fotos reais
 // ════════════════════════════════════
-const CHAR_SVG_LEANDRO = `
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 36" width="45" height="90" shape-rendering="crispEdges">
-  <rect x="0" y="3" width="3" height="8" fill="#1E0F00"/>
-  <rect x="0" y="5" width="2" height="5" fill="#2E1A00"/>
-  <rect x="15" y="3" width="3" height="8" fill="#1E0F00"/>
-  <rect x="16" y="5" width="2" height="5" fill="#2E1A00"/>
-  <rect x="2" y="0" width="14" height="3" fill="#1E0F00"/>
-  <rect x="3" y="1" width="12" height="4" fill="#2E1A00"/>
-  <rect x="1" y="2" width="3" height="5" fill="#1E0F00"/>
-  <rect x="14" y="2" width="3" height="5" fill="#1E0F00"/>
-  <rect x="3" y="4" width="12" height="8" fill="#E8B08A"/>
-  <rect x="4" y="5" width="4" height="1" fill="#1E0F00"/>
-  <rect x="10" y="5" width="4" height="1" fill="#1E0F00"/>
-  <rect x="4" y="6" width="4" height="3" fill="#1A1A1A"/>
-  <rect x="10" y="6" width="4" height="3" fill="#1A1A1A"/>
-  <rect x="4" y="6" width="2" height="2" fill="#FFF"/>
-  <rect x="11" y="6" width="2" height="2" fill="#FFF"/>
-  <rect x="5" y="7" width="1" height="1" fill="#000"/>
-  <rect x="12" y="7" width="1" height="1" fill="#000"/>
-  <rect x="8" y="9" width="2" height="1" fill="#C07860"/>
-  <rect x="6" y="10" width="6" height="1" fill="#C07860"/>
-  <rect x="7" y="11" width="4" height="1" fill="#7A2020"/>
-  <rect x="5" y="12" width="8" height="5" fill="#E8B08A"/>
-  <rect x="2" y="17" width="6" height="4" fill="#C8A0D8"/>
-  <rect x="3" y="18" width="4" height="2" fill="#B088C8"/>
-  <rect x="2" y="17" width="6" height="1" fill="#E0C0F0"/>
-  <rect x="10" y="17" width="6" height="4" fill="#C8A0D8"/>
-  <rect x="11" y="18" width="4" height="2" fill="#B088C8"/>
-  <rect x="10" y="17" width="6" height="1" fill="#E0C0F0"/>
-  <rect x="8" y="18" width="2" height="2" fill="#F0D0FF"/>
-  <rect x="0" y="17" width="2" height="6" fill="#E8B08A"/>
-  <rect x="16" y="17" width="2" height="6" fill="#E8B08A"/>
-  <rect x="0" y="22" width="3" height="2" fill="#E8B08A"/>
-  <rect x="15" y="22" width="3" height="2" fill="#E8B08A"/>
-  <rect x="3" y="21" width="12" height="4" fill="#E8B08A"/>
-  <rect x="2" y="22" width="14" height="2" fill="#E8B08A"/>
-  <rect x="3" y="25" width="12" height="1" fill="#089898"/>
-  <rect x="4" y="26" width="10" height="3" fill="#0AB8B8"/>
-  <rect x="5" y="27" width="8" height="2" fill="#0ACACA"/>
-  <rect x="4" y="26" width="3" height="1" fill="#089090"/>
-  <rect x="8" y="26" width="3" height="1" fill="#089090"/>
-  <rect x="5" y="28" width="3" height="1" fill="#089090"/>
-  <rect x="9" y="28" width="3" height="1" fill="#089090"/>
-  <rect x="4" y="29" width="10" height="3" fill="#0AB8B8"/>
-  <rect x="3" y="30" width="12" height="2" fill="#0ACACA"/>
-  <rect x="1" y="32" width="6" height="2" fill="#0ACACA"/>
-  <rect x="11" y="32" width="6" height="2" fill="#0ACACA"/>
-  <rect x="0" y="33" width="5" height="2" fill="#089090"/>
-  <rect x="13" y="33" width="5" height="2" fill="#089090"/>
-  <rect x="6" y="32" width="6" height="1" fill="#067070"/>
-</svg>`;
-
-// Ruy Sereia — cauda verde
-const CHAR_SVG_RUY = `
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 36" width="42" height="84" shape-rendering="crispEdges">
-  <rect x="2" y="0" width="14" height="3" fill="#0A1A0A"/>
-  <rect x="3" y="1" width="12" height="4" fill="#153015"/>
-  <rect x="1" y="2" width="3" height="5" fill="#0A1A0A"/>
-  <rect x="14" y="2" width="3" height="5" fill="#0A1A0A"/>
-  <rect x="0" y="3" width="3" height="7" fill="#0A1A0A"/>
-  <rect x="15" y="3" width="3" height="7" fill="#0A1A0A"/>
-  <rect x="3" y="4" width="12" height="8" fill="#D4A87A"/>
-  <rect x="4" y="5" width="4" height="1" fill="#0A1A0A"/>
-  <rect x="10" y="5" width="4" height="1" fill="#0A1A0A"/>
-  <rect x="4" y="6" width="4" height="3" fill="#1A1A1A"/>
-  <rect x="10" y="6" width="4" height="3" fill="#1A1A1A"/>
-  <rect x="4" y="6" width="2" height="2" fill="#FFF"/>
-  <rect x="11" y="6" width="2" height="2" fill="#FFF"/>
-  <rect x="5" y="7" width="1" height="1" fill="#000"/>
-  <rect x="12" y="7" width="1" height="1" fill="#000"/>
-  <rect x="8" y="9" width="2" height="1" fill="#B07050"/>
-  <rect x="6" y="10" width="6" height="2" fill="#B07050"/>
-  <rect x="5" y="12" width="8" height="5" fill="#D4A87A"/>
-  <rect x="4" y="11" width="2" height="3" fill="#8B5E3C"/>
-  <rect x="12" y="11" width="2" height="3" fill="#8B5E3C"/>
-  <rect x="3" y="13" width="2" height="2" fill="#7A5030"/>
-  <rect x="13" y="13" width="2" height="2" fill="#7A5030"/>
-  <rect x="2" y="17" width="6" height="4" fill="#1A6B3A"/>
-  <rect x="3" y="18" width="4" height="2" fill="#145530"/>
-  <rect x="2" y="17" width="6" height="1" fill="#2A9050"/>
-  <rect x="10" y="17" width="6" height="4" fill="#1A6B3A"/>
-  <rect x="11" y="18" width="4" height="2" fill="#145530"/>
-  <rect x="10" y="17" width="6" height="1" fill="#2A9050"/>
-  <rect x="8" y="18" width="2" height="2" fill="#3AB060"/>
-  <rect x="0" y="17" width="2" height="6" fill="#D4A87A"/>
-  <rect x="16" y="17" width="2" height="6" fill="#D4A87A"/>
-  <rect x="0" y="22" width="3" height="2" fill="#D4A87A"/>
-  <rect x="15" y="22" width="3" height="2" fill="#D4A87A"/>
-  <rect x="3" y="21" width="12" height="4" fill="#D4A87A"/>
-  <rect x="2" y="22" width="14" height="2" fill="#D4A87A"/>
-  <rect x="3" y="25" width="12" height="1" fill="#1A8040"/>
-  <rect x="4" y="26" width="10" height="3" fill="#22A050"/>
-  <rect x="5" y="27" width="8" height="2" fill="#28BB5A"/>
-  <rect x="4" y="26" width="3" height="1" fill="#1A8040"/>
-  <rect x="8" y="26" width="3" height="1" fill="#1A8040"/>
-  <rect x="5" y="28" width="3" height="1" fill="#1A8040"/>
-  <rect x="9" y="28" width="3" height="1" fill="#1A8040"/>
-  <rect x="4" y="29" width="10" height="3" fill="#22A050"/>
-  <rect x="3" y="30" width="12" height="2" fill="#28BB5A"/>
-  <rect x="1" y="32" width="6" height="2" fill="#28BB5A"/>
-  <rect x="11" y="32" width="6" height="2" fill="#28BB5A"/>
-  <rect x="0" y="33" width="5" height="2" fill="#1A8040"/>
-  <rect x="13" y="33" width="5" height="2" fill="#1A8040"/>
-  <rect x="6" y="32" width="6" height="1" fill="#156030"/>
-</svg>`;
+const IMG_LEANDRO = 'leandro-sereia.png';
+const IMG_RUY     = 'ChatGPT%20Image%2030_05_2026%2C%2014_56_25.png';
 
 function initCharacters(){
   const layer = document.getElementById('char-layer');
@@ -993,7 +892,9 @@ function initCharacters(){
     badge.textContent = 'RUY';
     const inner = document.createElement('div');
     inner.className = 'char-inner ruy';
-    inner.innerHTML = CHAR_SVG_RUY;
+    const imgRuy = document.createElement('img');
+    imgRuy.src = IMG_RUY; imgRuy.alt = 'Ruy Sereia'; imgRuy.className = 'char-img ruy';
+    inner.appendChild(imgRuy);
     wrap.appendChild(badge);
     wrap.appendChild(inner);
     layer.appendChild(wrap);
@@ -1026,7 +927,9 @@ function initCharacters(){
     badge.textContent = 'LEANDRO';
     const inner = document.createElement('div');
     inner.className = 'char-inner leandro';
-    inner.innerHTML = CHAR_SVG_LEANDRO;
+    const imgLeandro = document.createElement('img');
+    imgLeandro.src = IMG_LEANDRO; imgLeandro.alt = 'Leandro Sereia'; imgLeandro.className = 'char-img';
+    inner.appendChild(imgLeandro);
     wrap.appendChild(badge);
     wrap.appendChild(inner);
     layer.appendChild(wrap);
