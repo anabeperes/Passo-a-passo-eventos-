@@ -32,7 +32,6 @@
       color: var(--text);
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       padding-bottom: 40px;
-      overflow-x: hidden;
     }
 
     /* ── BOLHAS DE FUNDO ── */
@@ -313,7 +312,7 @@
 
 <!-- TRAIL -->
 <div class="road-wrap" id="roadWrap">
-  <svg id="road-svg" viewBox="-32 -32 424 1364" xmlns="http://www.w3.org/2000/svg">
+  <svg id="road-svg" viewBox="0 0 360 1300" xmlns="http://www.w3.org/2000/svg">
     <!-- fundo gradiente oceânico atrás da estrada -->
     <defs>
       <linearGradient id="oceanGrad" x1="0" y1="0" x2="0" y2="1">
@@ -724,64 +723,84 @@ function openLockedMsg(){
 //  (inspirado no Leandro das imagens)
 // ════════════════════════════════════
 const CHAR_SVG = `
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 28" width="64" height="56" shape-rendering="crispEdges">
-  <!-- pernas traseiras esquerdas -->
-  <rect x="5" y="19" width="2" height="6" fill="#B02800"/>
-  <rect x="3" y="24" width="4" height="1" fill="#901800"/>
-  <!-- pernas traseiras direitas -->
-  <rect x="25" y="19" width="2" height="6" fill="#B02800"/>
-  <rect x="25" y="24" width="4" height="1" fill="#901800"/>
-  <!-- pernas dianteiras esquerdas -->
-  <rect x="7" y="18" width="2" height="5" fill="#B02800"/>
-  <rect x="6" y="22" width="3" height="1" fill="#901800"/>
-  <!-- pernas dianteiras direitas -->
-  <rect x="23" y="18" width="2" height="5" fill="#B02800"/>
-  <rect x="23" y="22" width="3" height="1" fill="#901800"/>
-  <!-- garra esquerda -->
-  <rect x="0" y="7" width="6" height="5" fill="#CC3000"/>
-  <rect x="0" y="6" width="4" height="3" fill="#DD4000"/>
-  <rect x="2" y="11" width="4" height="2" fill="#AA2000"/>
-  <!-- garra direita -->
-  <rect x="26" y="7" width="6" height="5" fill="#CC3000"/>
-  <rect x="28" y="6" width="4" height="3" fill="#DD4000"/>
-  <rect x="26" y="11" width="4" height="2" fill="#AA2000"/>
-  <!-- corpo principal -->
-  <rect x="6" y="8" width="20" height="12" fill="#CC3000"/>
-  <!-- carapaça -->
-  <rect x="8" y="9" width="16" height="9" fill="#DD4000"/>
-  <rect x="10" y="10" width="12" height="6" fill="#EE5000"/>
-  <!-- nervura central -->
-  <rect x="15" y="9" width="2" height="9" fill="#CC3000"/>
-  <!-- nervuras horizontais -->
-  <rect x="8" y="12" width="16" height="1" fill="#BB2800"/>
-  <!-- barriga -->
-  <rect x="10" y="17" width="12" height="3" fill="#BB2800"/>
-  <!-- stalks dos olhos -->
-  <rect x="10" y="3" width="3" height="6" fill="#CC3000"/>
-  <rect x="19" y="3" width="3" height="6" fill="#CC3000"/>
-  <!-- olhos -->
-  <rect x="9" y="2" width="5" height="4" fill="#111"/>
-  <rect x="18" y="2" width="5" height="4" fill="#111"/>
-  <rect x="9" y="2" width="2" height="2" fill="#FFF"/>
-  <rect x="20" y="2" width="2" height="2" fill="#FFF"/>
-  <rect x="10" y="2" width="1" height="1" fill="#000"/>
-  <rect x="21" y="2" width="1" height="1" fill="#000"/>
-  <!-- armação dos óculos esquerda -->
-  <rect x="8" y="4" width="7" height="1" fill="#222"/>
-  <rect x="8" y="7" width="7" height="1" fill="#222"/>
-  <rect x="8" y="4" width="1" height="4" fill="#222"/>
-  <rect x="14" y="4" width="1" height="4" fill="#222"/>
-  <!-- armação dos óculos direita -->
-  <rect x="17" y="4" width="7" height="1" fill="#222"/>
-  <rect x="17" y="7" width="7" height="1" fill="#222"/>
-  <rect x="17" y="4" width="1" height="4" fill="#222"/>
-  <rect x="23" y="4" width="1" height="4" fill="#222"/>
-  <!-- ponte dos óculos -->
-  <rect x="15" y="5" width="2" height="1" fill="#222"/>
-  <!-- barba -->
-  <rect x="11" y="18" width="10" height="2" fill="#2A1400"/>
-  <rect x="10" y="19" width="12" height="2" fill="#3A1E00"/>
-  <rect x="11" y="21" width="10" height="1" fill="#2A1000"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 36" width="45" height="90" shape-rendering="crispEdges">
+  <!-- cabelo cacheado esquerda -->
+  <rect x="0" y="3" width="3" height="8" fill="#1E0F00"/>
+  <rect x="0" y="5" width="2" height="5" fill="#2E1A00"/>
+  <!-- cabelo cacheado direita -->
+  <rect x="15" y="3" width="3" height="8" fill="#1E0F00"/>
+  <rect x="16" y="5" width="2" height="5" fill="#2E1A00"/>
+  <!-- topo da cabeça / cabelo -->
+  <rect x="2" y="0" width="14" height="3" fill="#1E0F00"/>
+  <rect x="3" y="1" width="12" height="4" fill="#2E1A00"/>
+  <rect x="1" y="2" width="3" height="5" fill="#1E0F00"/>
+  <rect x="14" y="2" width="3" height="5" fill="#1E0F00"/>
+  <!-- rosto -->
+  <rect x="3" y="4" width="12" height="8" fill="#C8845A"/>
+  <!-- sobrancelhas preocupadas -->
+  <rect x="4" y="5" width="4" height="1" fill="#1E0F00"/>
+  <rect x="10" y="5" width="4" height="1" fill="#1E0F00"/>
+  <rect x="4" y="4" width="1" height="1" fill="#1E0F00"/>
+  <rect x="13" y="4" width="1" height="1" fill="#1E0F00"/>
+  <!-- olhos arregalados -->
+  <rect x="4" y="6" width="4" height="3" fill="#1A1A1A"/>
+  <rect x="10" y="6" width="4" height="3" fill="#1A1A1A"/>
+  <rect x="4" y="6" width="2" height="2" fill="#FFF"/>
+  <rect x="11" y="6" width="2" height="2" fill="#FFF"/>
+  <rect x="5" y="7" width="1" height="1" fill="#000"/>
+  <rect x="12" y="7" width="1" height="1" fill="#000"/>
+  <!-- nariz -->
+  <rect x="8" y="9" width="2" height="1" fill="#A86040"/>
+  <!-- boca aberta (surpreso) -->
+  <rect x="6" y="10" width="6" height="1" fill="#A86040"/>
+  <rect x="7" y="11" width="4" height="1" fill="#7A2020"/>
+  <!-- barba escura -->
+  <rect x="3" y="10" width="3" height="3" fill="#2E1A00"/>
+  <rect x="12" y="10" width="3" height="3" fill="#2E1A00"/>
+  <rect x="3" y="12" width="12" height="3" fill="#2E1A00"/>
+  <rect x="5" y="11" width="8" height="2" fill="#3A2200"/>
+  <!-- pescoço / barriga -->
+  <rect x="5" y="15" width="8" height="2" fill="#C8845A"/>
+  <!-- top de conchas (esquerda) -->
+  <rect x="2" y="17" width="6" height="4" fill="#C8A0D8"/>
+  <rect x="3" y="18" width="4" height="2" fill="#B088C8"/>
+  <rect x="2" y="17" width="6" height="1" fill="#E0C0F0"/>
+  <!-- top de conchas (direita) -->
+  <rect x="10" y="17" width="6" height="4" fill="#C8A0D8"/>
+  <rect x="11" y="18" width="4" height="2" fill="#B088C8"/>
+  <rect x="10" y="17" width="6" height="1" fill="#E0C0F0"/>
+  <!-- centro do top -->
+  <rect x="8" y="18" width="2" height="2" fill="#F0D0FF"/>
+  <!-- braços -->
+  <rect x="0" y="17" width="2" height="6" fill="#C8845A"/>
+  <rect x="16" y="17" width="2" height="6" fill="#C8845A"/>
+  <rect x="0" y="22" width="3" height="2" fill="#C8845A"/>
+  <rect x="15" y="22" width="3" height="2" fill="#C8845A"/>
+  <!-- barriga (plump, como na imagem) -->
+  <rect x="3" y="21" width="12" height="4" fill="#C8845A"/>
+  <rect x="2" y="22" width="14" height="2" fill="#C8845A"/>
+  <!-- cintura / escamas início -->
+  <rect x="3" y="25" width="12" height="1" fill="#089898"/>
+  <!-- cauda escamas (teal iridescente) -->
+  <rect x="4" y="26" width="10" height="3" fill="#0AB8B8"/>
+  <rect x="5" y="27" width="8" height="2" fill="#0ACACA"/>
+  <!-- padrão de escamas -->
+  <rect x="4" y="26" width="3" height="1" fill="#089090"/>
+  <rect x="8" y="26" width="3" height="1" fill="#089090"/>
+  <rect x="12" y="26" width="2" height="1" fill="#089090"/>
+  <rect x="5" y="28" width="3" height="1" fill="#089090"/>
+  <rect x="9" y="28" width="3" height="1" fill="#089090"/>
+  <rect x="4" y="29" width="10" height="3" fill="#0AB8B8"/>
+  <rect x="3" y="30" width="12" height="2" fill="#0ACACA"/>
+  <rect x="3" y="30" width="3" height="1" fill="#089090"/>
+  <rect x="7" y="30" width="3" height="1" fill="#089090"/>
+  <rect x="11" y="30" width="3" height="1" fill="#089090"/>
+  <!-- nadadeira (fin) -->
+  <rect x="1" y="32" width="6" height="2" fill="#0ACACA"/>
+  <rect x="11" y="32" width="6" height="2" fill="#0ACACA"/>
+  <rect x="0" y="33" width="5" height="2" fill="#089090"/>
+  <rect x="13" y="33" width="5" height="2" fill="#089090"/>
+  <rect x="6" y="32" width="6" height="1" fill="#067070"/>
 </svg>`;
 
 function initCharacter(){
