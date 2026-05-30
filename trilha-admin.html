@@ -250,8 +250,11 @@ async function saveAll(){
   document.querySelectorAll('#cfgStepList .type-select').forEach(sel=>{const i=+sel.dataset.idx;if(STEPS[i])STEPS[i].type=sel.value;});
   document.querySelectorAll('#cfgStepList .text-input').forEach(ta=>{const i=+ta.dataset.idx;if(STEPS[i])STEPS[i].text=ta.value;});
   const stepsWithId=STEPS.map((s,i)=>({id:i+1,type:s.type,title:s.title,text:s.text||''}));
-  STEPS=stepsWithId;CPS=stepsWithId.map(s=>{const ex=CPS.find(c=>c.id===s.id);return ex||{id:s.id,name:'',desc:'',link:''};});
-  const payload={...fbData,steps:stepsWithId,step:0,cps:{},titles:{}};
+  // Preserva dados de checkpoint existentes ao reatribuir IDs sequenciais
+  const oldCPS=[...CPS];
+  STEPS=stepsWithId;CPS=stepsWithId.map((s,i)=>{const ex=oldCPS[i];return{id:s.id,name:ex?.name||'',desc:ex?.desc||'',link:ex?.link||''}});
+  const cpsObj={};CPS.forEach(cp=>{if(cp.name||cp.desc||cp.link)cpsObj[String(cp.id)]={name:cp.name,desc:cp.desc,link:cp.link};});
+  const payload={...fbData,steps:stepsWithId,step:0,cps:cpsObj,titles:{}};
   const btn=document.getElementById('saveBtn');btn.disabled=true;btn.textContent='SALVANDO...';
   try{const r=await fetch(CFG.firebase.url+CFG.firebase.path,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});if(!r.ok)throw 0;fbData=payload;unlocked=0;setSyncLive(true);document.getElementById('saveOk').classList.add('on');document.getElementById('saveErr').classList.remove('on');document.getElementById('saveInfo').textContent=`${stepsWithId.length} etapas salvas`;dirty=false;renderCtrl();}
   catch(e){setSyncLive(false);document.getElementById('saveErr').classList.add('on');}
@@ -315,7 +318,7 @@ async function fecharOferta(){
   try{const r=await fetch(CFG.firebase.url+CFG.firebase.path,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(buildPayload({oferta:false}))});
   const s=document.getElementById('ofertaStatus');s.style.color='var(--muted)';s.textContent=r.ok?'Oferta fechada':'';}catch(e){}
 }
-async function pushState(){if(!isFB)return;try{const r=await fetch(CFG.firebase.url+CFG.firebase.path,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(buildPayload())});setSyncLive(r.ok);}catch(e){setSyncLive(false);}}
+async function pushState(){if(!isFB)return;try{const r=await fetch(CFG.firebase.url+CFG.firebase.path,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(buildPayload())});setSyncLive(r.ok);if(!r.ok)console.error('pushState HTTP',r.status);}catch(e){setSyncLive(false);console.error('pushState falhou:',e);}}
 async function pullState(){
   if(!isFB)return;
   try{

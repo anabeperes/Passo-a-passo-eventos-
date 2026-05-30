@@ -469,6 +469,11 @@
   <div class="notice-txt">⚠ SEM SYNC EM TEMPO REAL<br>configure CFG.firebase.url</div>
 </div>
 
+<!-- NOTICE erro de conexão -->
+<div class="notice" id="fbErrNotice" style="border-color:#5A2000;background:#180800">
+  <div class="notice-txt" style="color:#FF7B72">⚠ SEM CONEXÃO COM O SERVIDOR<br>Atualize a página se a trilha não carregar</div>
+</div>
+
 <!-- TRAIL -->
 <div class="road-wrap" id="roadWrap">
   <svg id="road-svg" viewBox="0 0 360 1300" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMin meet">
@@ -562,6 +567,7 @@
 const CFG = {
   title:   "🌊 MERGULHANDO NA IA",
   backUrl: "/",                            // URL do botão Voltar
+  ruyStep: 4,                              // Em qual etapa o Ruy fica parado (1-based)
   firebase: {
     url:  "https://passo-a-passo-eventos-default-rtdb.firebaseio.com",
     path: "/trilha.json"
@@ -669,8 +675,11 @@ function goBack(e){
 // ════════════════════════════════════
 //  NOME DO PARTICIPANTE
 // ════════════════════════════════════
+// Chave única por evento para evitar colisão entre eventos diferentes no mesmo domínio
+const NAME_KEY = 'trilha_name_' + CFG.title.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+
 function checkName(){
-  const name = localStorage.getItem('trilha_name');
+  const name = localStorage.getItem(NAME_KEY);
   if (name) applyName(name);
   else document.getElementById('name-overlay').classList.remove('hidden');
   document.getElementById('nameInput').addEventListener('keydown', e => { if (e.key==='Enter') saveName(); });
@@ -678,7 +687,7 @@ function checkName(){
 function saveName(){
   const val = document.getElementById('nameInput').value.trim();
   if (!val) return;
-  localStorage.setItem('trilha_name', val);
+  localStorage.setItem(NAME_KEY, val);
   applyName(val);
   document.getElementById('name-overlay').classList.add('hidden');
 }
@@ -944,10 +953,10 @@ function updateCharacters(animate = true){
   const N     = STEPS.length > 0 ? STEPS.length * 2 + 1 : 3;
   const scale = getScale();
 
-  // Ruy — fixo na 4ª etapa
+  // Ruy — fixo na etapa configurada em CFG.ruyStep
   const ruy = document.getElementById('trail-ruy');
   if (ruy && STEPS.length > 0){
-    const ruyStepIdx = Math.min(3, STEPS.length - 1);  // step index 0-based
+    const ruyStepIdx = Math.min(CFG.ruyStep - 1, STEPS.length - 1);  // step index 0-based
     const ruyMarker  = 1 + ruyStepIdx * 2;             // odd marker index
     const ruyT       = (ruyMarker / (N-1)) * total;
     const ruyPt      = path.getPointAtLength(ruyT);
@@ -964,7 +973,7 @@ function updateCharacters(animate = true){
   const leandroPt  = path.getPointAtLength(leandroT);
 
   // Se Leandro está na mesma posição que Ruy, offset lateral
-  const ruyStepIdx = Math.min(3, STEPS.length - 1);
+  const ruyStepIdx = Math.min(CFG.ruyStep - 1, STEPS.length - 1);
   const ruyMarker  = STEPS.length > 0 ? 1 + ruyStepIdx * 2 : -1;
   const samePos    = leandroIdx === ruyMarker && STEPS.length > 0;
   const offset     = samePos ? 38 * scale : 0;
@@ -1001,6 +1010,7 @@ async function pullState(){
     if (!r.ok) throw 0;
     const data = await r.json();
     syncLive = true;
+    document.getElementById('fbErrNotice').classList.remove('on');
     let changed = false;
 
     if (data && typeof data === 'object'){
@@ -1038,7 +1048,10 @@ async function pullState(){
     }
 
     if (changed){ buildTrail(); updateCharacters(true); }
-  } catch(e){ syncLive = false; }
+  } catch(e){
+    syncLive = false;
+    document.getElementById('fbErrNotice').classList.add('on');
+  }
   updateDot();
 }
 
