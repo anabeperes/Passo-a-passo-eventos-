@@ -3,7 +3,7 @@
 <!--
   TRILHA — PARTICIPANTE (view-only)
   ==================================
-  FIREBASE : cole a URL em CFG.firebase.url
+  FIREBASE : configure CFG.firebase.url
   HOSPEDAGEM : netlify.com/drop (arraste o arquivo)
 -->
 <head>
@@ -13,33 +13,38 @@
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root {
-      --bg:    #020D14;
-      --bg2:   #041824;
-      --road:  #052840;
-      --edge:  #083858;
-      --dash:  #00C8D4;
-      --bdr:   #0A3D5C;
-      --text:  #C8E8F4;
-      --muted: #2A6080;
-      --acc:   #00C8D4;
-      --glow:  #FF7A20;
-      --px:    'Press Start 2P', monospace;
+
+    /* ── DESIGN TOKENS ── */
+    .trilha-root {
+      --trilha-bg:    #020D14;
+      --trilha-bg2:   #041824;
+      --trilha-road:  #052840;
+      --trilha-edge:  #083858;
+      --trilha-dash:  #00C8D4;
+      --trilha-bdr:   #0A3D5C;
+      --trilha-text:  #C8E8F4;
+      --trilha-muted: #2A6080;
+      --trilha-acc:   #00C8D4;
+      --trilha-glow:  #FF7A20;
     }
 
     body {
-      background: var(--bg);
-      color: var(--text);
+      background: var(--trilha-bg);
+      color: var(--trilha-text);
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      padding-bottom: 40px;
+      padding-bottom: 60px;
+      background-image: radial-gradient(ellipse at 50% 0%, rgba(0,200,212,.06) 0%, transparent 60%);
+      min-height: 100vh;
     }
+
+    .trilha-pixel { font-family: 'Press Start 2P', monospace; }
 
     /* ── BOLHAS DE FUNDO ── */
     .bubble {
       position: fixed;
       border-radius: 50%;
-      background: rgba(0, 200, 212, 0.12);
-      border: 1px solid rgba(0, 200, 212, 0.25);
+      background: rgba(0, 200, 212, 0.10);
+      border: 1px solid rgba(0, 200, 212, 0.22);
       pointer-events: none;
       z-index: 0;
       animation: bubble-rise linear infinite;
@@ -47,194 +52,359 @@
     @keyframes bubble-rise {
       0%   { transform: translateY(0) translateX(0) scale(1); opacity: 0; }
       10%  { opacity: 1; }
-      90%  { opacity: 0.6; }
-      100% { transform: translateY(-110vh) translateX(20px) scale(1.4); opacity: 0; }
+      90%  { opacity: 0.55; }
+      100% { transform: translateY(-120vh) translateX(20px) scale(1.4); opacity: 0; }
     }
 
     /* ── HEADER ── */
     .hdr {
-      background: #010810;
-      border-bottom: 2px solid var(--bdr);
-      padding: 16px 16px 12px;
+      background: rgba(1,8,16,.96);
+      border-bottom: 2px solid var(--trilha-bdr);
+      padding: 12px 14px 10px;
       position: sticky; top: 0; z-index: 50;
-      box-shadow: 0 2px 20px rgba(0,200,212,.12);
+      box-shadow: 0 2px 24px rgba(0,200,212,.10);
+      max-width: 100%;
     }
-    .hdr-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 10px; }
-    .hdr-title { font-family: var(--px); font-size: 9px; color: var(--acc); line-height: 1.9; flex: 1; }
-    .sync-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); margin-top: 3px; margin-left: 10px; flex-shrink: 0; transition: background .4s; }
-    .sync-dot.live { background: #00E5B0; box-shadow: 0 0 6px #00E5B0; }
-    .prog-bar { height: 6px; background: var(--bdr); overflow: hidden; border-radius: 3px; }
-    .prog-fill { height: 100%; background: linear-gradient(90deg, var(--acc), var(--glow)); transition: width .5s ease; border-radius: 3px; }
-    .prog-txt  { font-size: 10px; color: var(--muted); margin-top: 5px; font-family: monospace; }
-
-    /* ── NOTICE ── */
-    .notice { background: #001A20; border: 1px solid #005060; padding: 10px 14px; margin: 12px 16px 0; max-width: 500px; margin-left: auto; margin-right: auto; display: none; }
-    .notice.on { display: block; }
-    .notice-txt { font-family: var(--px); font-size: 7px; color: #0090A0; line-height: 1.9; }
-
-    /* ── TRAIL ── */
-    .road-wrap { position: relative; max-width: 500px; margin: 0 auto; padding: 12px 0 24px; z-index: 1; overflow: visible; }
-    #road-svg { display: block; width: 100%; height: auto; overflow: visible; }
-    #items-layer { position: absolute; top: 12px; left: 0; width: 100%; pointer-events: none; overflow: visible; }
-
-    /* ── STOP MARKER ── */
-    .stop-dot { position: absolute; width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--bg); transform: translate(-50%,-50%); z-index: 2; pointer-events: none; }
-    .stop-dot.off { background: var(--muted) !important; opacity: .35; }
-
-    .stop-label { position: absolute; transform: translate(-50%,-50%); background: var(--bg2); border: 2px solid var(--bdr); padding: 6px 8px; max-width: 90px; pointer-events: none; z-index: 3; }
-    .stop-label.off { opacity: .3; }
-    .stop-num   { font-size: 9px; font-family: monospace; color: var(--muted); display: block; margin-bottom: 3px; }
-    .stop-badge { font-family: var(--px); font-size: 5px; display: inline-block; padding: 2px 5px; margin-bottom: 4px; letter-spacing: .3px; }
-    .stop-name  { font-family: var(--px); font-size: 6px; line-height: 1.75; color: var(--text); word-break: break-word; }
-    .stop-label.off .stop-name { color: var(--muted); }
-    .stop-label.stop-clickable:hover { border-color: var(--acc); background: var(--bg2); }
-
-    /* ── STOP EMOJI ── */
-    .stop-emoji { position: absolute; transform: translate(-50%,-50%); font-size: 22px; z-index: 3; pointer-events: auto; cursor: pointer; user-select: none; transition: transform .15s; }
-    .stop-emoji:hover { transform: translate(-50%,-50%) scale(1.25); }
-    .stop-emoji.off { opacity: .3; }
-
-    /* ── CHECKPOINT ── */
-    .cp-item { position: absolute; z-index: 5; pointer-events: auto; }
-    .cp-sq {
-      width: 38px; height: 38px; background: var(--bg); border: 2px solid var(--muted);
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer; transform: translate(-50%,-50%);
-      transition: border-color .2s, background .2s;
-      border-radius: 4px;
+    .hdr-inner { max-width: 768px; margin: 0 auto; }
+    .hdr-row1 { display: flex; align-items: center; gap: 8px; margin-bottom: 9px; }
+    .hdr-back {
+      display: flex; align-items: center; gap: 5px;
+      background: transparent;
+      border: 1px solid var(--trilha-bdr);
+      border-radius: 999px;
+      color: var(--trilha-muted);
+      padding: 5px 10px 5px 8px;
+      font-family: 'Press Start 2P', monospace;
+      font-size: 6px;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: border-color .2s, color .2s;
+      outline: none;
+      box-shadow: 0 0 0 0 rgba(0,200,212,0);
+      text-decoration: none;
     }
-    .cp-sq:hover:not(.cp-lock) { border-color: var(--acc); background: var(--bg2); box-shadow: 0 0 10px rgba(0,200,212,.3); }
-    .cp-sq.has-c { border-color: var(--acc); box-shadow: 0 0 8px rgba(0,200,212,.25); }
-    .cp-sq.cp-lock { opacity: .15; cursor: default; pointer-events: none; }
-    .cp-ico { font-family: var(--px); font-size: 10px; color: var(--muted); user-select: none; line-height: 1; }
-    .cp-sq.has-c .cp-ico { color: var(--acc); }
-
-    /* ── START / END ── */
-    .trail-flag { position: absolute; transform: translate(-50%,-50%); text-align: center; z-index: 6; pointer-events: none; }
-    .flag-icon { font-size: 26px; display: block; }
-    .flag-txt  { font-family: var(--px); font-size: 7px; color: var(--acc); display: block; margin-top: 4px; line-height: 1.7; white-space: nowrap; text-shadow: 0 0 8px rgba(0,200,212,.6); }
-
-    /* ── PERSONAGEM ── */
-    #char-layer { position: absolute; top: 12px; left: 0; width: 100%; pointer-events: none; overflow: visible; z-index: 10; }
-    #trail-char {
-      position: absolute;
-      transition: left .9s cubic-bezier(.4,0,.2,1), top .9s cubic-bezier(.4,0,.2,1);
+    .hdr-back:hover, .hdr-back:focus {
+      border-color: var(--trilha-acc);
+      color: var(--trilha-acc);
+      box-shadow: 0 0 0 2px rgba(0,200,212,.18);
     }
-    .char-inner {
-      transform: translate(-50%, -100%);
-      animation: char-bob 1.4s ease-in-out infinite;
-      filter: drop-shadow(0 0 8px #00C8D4) drop-shadow(0 0 16px rgba(0,200,212,.4)) drop-shadow(0 2px 4px rgba(0,0,0,.9));
+    .hdr-back svg { width: 10px; height: 10px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .hdr-title {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 8px;
+      color: var(--trilha-acc);
+      line-height: 1.9;
+      flex: 1;
+      text-align: center;
     }
-    @keyframes char-bob {
-      0%, 100% { transform: translate(-50%, -100%); }
-      50%       { transform: translate(-50%, calc(-100% - 6px)); }
+    .hdr-live {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--trilha-muted);
+      flex-shrink: 0;
+      transition: background .4s, box-shadow .4s;
     }
-    .char-inner.pop { animation: char-pop .35s ease-out, char-bob 1.4s ease-in-out infinite .35s; }
-    @keyframes char-pop {
-      0%  { transform: translate(-50%, calc(-100% - 12px)) scale(1.3); }
-      100%{ transform: translate(-50%, -100%) scale(1); }
+    .hdr-live.on {
+      background: #00E5B0;
+      box-shadow: 0 0 0 3px rgba(0,229,176,.2);
+      animation: led-pulse 1.8s ease-in-out infinite;
     }
-
-    /* ── BOTTOM SHEET (checkpoint content) ── */
-    .sheet-bg { position: fixed; inset: 0; background: rgba(0,5,15,.8); display: none; z-index: 150; backdrop-filter: blur(2px); }
-    .sheet-bg.on { display: block; }
-    .sheet {
-      position: fixed; bottom: 0; left: 0; right: 0;
-      background: var(--bg2); border-top: 2px solid var(--acc);
-      padding: 20px 18px 34px; max-width: 500px; margin: 0 auto;
-      z-index: 160; max-height: 72vh; overflow-y: auto; display: none;
-      box-shadow: 0 -4px 30px rgba(0,200,212,.2);
+    @keyframes led-pulse {
+      0%,100% { box-shadow: 0 0 0 3px rgba(0,229,176,.2); }
+      50%      { box-shadow: 0 0 0 6px rgba(0,229,176,.0); }
     }
-    .sheet.on { display: block; }
-    .sheet-lbl { font-family: var(--px); font-size: 7px; color: var(--acc); display: block; margin-bottom: 14px; line-height: 1.8; padding-right: 40px; }
-    .sheet-desc { font-size: 14px; line-height: 1.75; color: #7AAABB; white-space: pre-wrap; }
-    .sheet-desc.empty { color: var(--muted); font-style: italic; font-size: 13px; }
-    .sheet-link { display: inline-flex; align-items: center; gap: 6px; margin-top: 14px; padding: 9px 14px; background: var(--acc); color: #010810; text-decoration: none; font-family: var(--px); font-size: 7px; }
-    .sheet-link:hover { background: var(--glow); }
-    .sheet-x { position: absolute; top: 16px; right: 16px; background: transparent; border: 1px solid var(--bdr); color: var(--muted); padding: 5px 9px; font-family: var(--px); font-size: 7px; cursor: pointer; }
-    .sheet-x:hover { border-color: var(--acc); color: var(--acc); }
+    .hdr-prog-bar { height: 6px; background: var(--trilha-bdr); border-radius: 3px; overflow: hidden; margin-bottom: 5px; }
+    .hdr-prog-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--trilha-acc), var(--trilha-glow));
+      border-radius: 3px;
+      width: 0%;
+      transition: width .5s ease;
+    }
+    .hdr-row2 { display: flex; align-items: center; justify-content: space-between; }
+    .hdr-steps { font-family: monospace; font-size: 10px; color: var(--trilha-muted); }
+    .hdr-name  { font-family: 'Press Start 2P', monospace; font-size: 6px; color: var(--trilha-acc); text-shadow: 0 0 8px rgba(0,200,212,.4); }
 
     /* ── FAQ BUTTON ── */
     #faq-btn {
-      position: fixed; top: 80px; right: 16px;
-      background: var(--acc); color: #010810;
+      position: fixed; top: 76px; right: 14px;
+      background: var(--trilha-acc); color: #010810;
       border: none; cursor: pointer; z-index: 90;
-      padding: 10px 12px; text-align: center;
-      font-family: var(--px); font-size: 7px; line-height: 1.9;
-      box-shadow: 0 4px 0 #007A80, 0 0 20px rgba(0,200,212,.4);
+      padding: 9px 11px; text-align: center;
+      font-family: 'Press Start 2P', monospace; font-size: 6px; line-height: 1.9;
+      box-shadow: 0 4px 0 #007A80, 0 0 20px rgba(0,200,212,.35);
+      border-radius: 6px;
       transition: transform .1s, box-shadow .1s;
     }
     #faq-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 #007A80; }
-    #faq-btn .faq-icon { font-size: 22px; display: block; margin-bottom: 4px; }
+    #faq-btn .faq-icon { font-size: 20px; display: block; margin-bottom: 3px; }
 
     /* ── FAQ PANEL ── */
     #faq-panel {
-      position: fixed; top: 190px; right: 16px;
-      width: 260px; background: var(--bg2); border: 2px solid var(--acc);
+      position: fixed; top: 180px; right: 14px;
+      width: min(288px, calc(100vw - 28px));
+      background: var(--trilha-bg2); border: 2px solid var(--trilha-acc);
       z-index: 91; display: none;
-      box-shadow: 0 0 20px rgba(0,200,212,.2);
+      box-shadow: 0 0 24px rgba(0,200,212,.18);
+      border-radius: 8px; overflow: hidden;
     }
     #faq-panel.on { display: block; }
     .faq-hdr {
-      background: var(--acc); color: #010810;
-      font-family: var(--px); font-size: 7px;
-      padding: 8px 10px; display: flex; align-items: center; justify-content: space-between;
+      background: var(--trilha-acc); color: #010810;
+      font-family: 'Press Start 2P', monospace; font-size: 7px;
+      padding: 9px 12px; display: flex; align-items: center; justify-content: space-between;
     }
-    .faq-close {
-      background: transparent; border: none; cursor: pointer;
-      font-size: 14px; color: #010810; line-height: 1; padding: 0 2px;
-    }
-    .faq-item { border-bottom: 1px solid var(--bdr); }
+    .faq-close { background: transparent; border: none; cursor: pointer; font-size: 15px; color: #010810; padding: 0 2px; }
+    .faq-item { border-bottom: 1px solid var(--trilha-bdr); }
     .faq-item:last-child { border-bottom: none; }
     .faq-q {
       display: flex; align-items: center; justify-content: space-between; gap: 8px;
       padding: 10px 12px; cursor: pointer;
-      font-family: var(--px); font-size: 9px; color: var(--text); line-height: 1.8;
+      font-family: 'Press Start 2P', monospace; font-size: 7px; color: var(--trilha-text); line-height: 1.8;
       background: transparent; border: none; width: 100%; text-align: left;
     }
-    .faq-q:hover { background: var(--bg); }
-    .faq-arrow { flex-shrink: 0; color: var(--acc); font-size: 10px; transition: transform .2s; }
+    .faq-q:hover { background: rgba(0,200,212,.05); }
+    .faq-arrow { flex-shrink: 0; color: var(--trilha-acc); font-size: 10px; transition: transform .2s; }
     .faq-item.open .faq-arrow { transform: rotate(90deg); }
-    .faq-a {
-      font-size: 14px; color: #7AAABB; line-height: 1.7;
-      padding: 0 12px 12px; display: none; white-space: pre-wrap;
-    }
+    .faq-a { font-size: 13px; color: #7AAABB; line-height: 1.7; padding: 0 12px 12px; display: none; white-space: pre-wrap; }
     .faq-item.open .faq-a { display: block; }
 
+    /* ── TRAIL ── */
+    .road-wrap {
+      position: relative; max-width: 500px; margin: 0 auto;
+      padding: 12px 0 24px; z-index: 1; overflow: visible;
+    }
+    #road-svg { display: block; width: 100%; height: auto; overflow: visible; }
+    #items-layer { position: absolute; top: 12px; left: 0; width: 100%; pointer-events: none; overflow: visible; }
+    #char-layer  { position: absolute; top: 12px; left: 0; width: 100%; pointer-events: none; overflow: visible; z-index: 10; }
+
+    /* ── MARKER: START/END ── */
+    .marker-pill {
+      position: absolute; transform: translate(-50%,-50%);
+      display: inline-flex; align-items: center; gap: 4px;
+      font-family: 'Press Start 2P', monospace; font-size: 7px;
+      padding: 5px 10px; border-radius: 999px;
+      pointer-events: none; z-index: 5; white-space: nowrap;
+    }
+    .marker-pill.start {
+      background: rgba(0,200,212,.15);
+      border: 2px solid var(--trilha-acc);
+      color: var(--trilha-acc);
+      box-shadow: 0 0 12px rgba(0,200,212,.25);
+    }
+    .marker-pill.end {
+      background: var(--trilha-bg2);
+      border: 2px solid var(--trilha-bdr);
+      color: var(--trilha-muted);
+      pointer-events: auto; cursor: default;
+      flex-direction: column; gap: 4px; padding: 10px 16px;
+      border-radius: 12px;
+    }
+    .marker-pill.end.done {
+      border-color: var(--trilha-glow);
+      color: var(--trilha-glow);
+      box-shadow: 0 0 20px rgba(255,122,32,.3);
+    }
+    .marker-pill.end .end-icon { font-size: 22px; }
+    .marker-pill.end .end-label { font-size: 6px; }
+
+    /* ── MARKER: STOP ── */
+    .stop-btn {
+      position: absolute; transform: translate(-50%,-50%);
+      width: 48px; height: 48px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px;
+      border: 3px solid transparent;
+      background: var(--trilha-bg2);
+      pointer-events: auto; cursor: pointer;
+      z-index: 4;
+      transition: transform .15s, box-shadow .15s;
+    }
+    .stop-btn:hover { transform: translate(-50%,-50%) scale(1.12); }
+    .stop-btn.locked {
+      background: rgba(42,96,128,.15);
+      border-color: var(--trilha-muted);
+      opacity: .55;
+      cursor: pointer;
+    }
+    .stop-btn.locked .stop-emoji { filter: grayscale(1); opacity: .6; }
+
+    /* ── MARKER: CHECKPOINT ── */
+    .cp-pill {
+      position: absolute; transform: translate(-50%,-50%);
+      font-family: 'Press Start 2P', monospace; font-size: 7px;
+      padding: 5px 10px; border-radius: 999px;
+      pointer-events: auto; cursor: pointer;
+      z-index: 5; display: inline-flex; align-items: center; gap: 5px;
+      transition: box-shadow .15s;
+    }
+    .cp-pill.unlocked {
+      background: rgba(255,122,32,.15);
+      border: 2px solid var(--trilha-glow);
+      color: var(--trilha-glow);
+    }
+    .cp-pill.unlocked:hover { box-shadow: 0 0 14px rgba(255,122,32,.35); }
+    .cp-pill.locked {
+      background: rgba(42,96,128,.1);
+      border: 2px solid var(--trilha-muted);
+      color: var(--trilha-muted);
+      opacity: .35;
+      pointer-events: none;
+      cursor: default;
+    }
+
+    /* ── CHARACTERS ── */
+    #trail-char, #trail-ruy {
+      position: absolute;
+      pointer-events: auto;
+      cursor: pointer;
+    }
+    #trail-char { transition: left .9s cubic-bezier(.4,0,.2,1), top .9s cubic-bezier(.4,0,.2,1); }
+
+    .char-inner {
+      transform: translate(-50%, -100%);
+      animation: char-bob 1.4s ease-in-out infinite;
+    }
+    .char-inner.leandro {
+      filter: drop-shadow(0 0 8px #00C8D4) drop-shadow(0 0 18px rgba(0,200,212,.35)) drop-shadow(0 2px 4px rgba(0,0,0,.9));
+    }
+    .char-inner.ruy {
+      filter: drop-shadow(0 0 8px #56D364) drop-shadow(0 0 18px rgba(86,211,100,.3)) drop-shadow(0 2px 4px rgba(0,0,0,.9));
+    }
+    @keyframes char-bob {
+      0%,100% { transform: translate(-50%, -100%); }
+      50%      { transform: translate(-50%, calc(-100% - 6px)); }
+    }
+    .char-inner.pop { animation: char-pop .6s ease-out, char-bob 1.4s ease-in-out infinite .6s; }
+    @keyframes char-pop {
+      0%   { transform: translate(-50%, calc(-100% - 12px)) scale(1.3); }
+      100% { transform: translate(-50%, -100%) scale(1); }
+    }
+    .char-badge {
+      position: absolute;
+      top: -118px; left: 50%;
+      transform: translateX(-50%);
+      font-family: 'Press Start 2P', monospace; font-size: 6px;
+      padding: 3px 7px;
+      white-space: nowrap; pointer-events: none; z-index: 11;
+      border-radius: 3px;
+    }
+    .char-badge.leandro { background: #00C8D4; color: #010810; box-shadow: 0 0 10px rgba(0,200,212,.5); }
+    .char-badge.ruy     { background: #56D364; color: #010810; box-shadow: 0 0 10px rgba(86,211,100,.45); }
+
+    /* ── BOTTOM SHEET ── */
+    .sheet-bg { position: fixed; inset: 0; background: rgba(0,5,15,.75); display: none; z-index: 150; backdrop-filter: blur(3px); }
+    .sheet-bg.on { display: block; }
+    .sheet {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: var(--trilha-bg2);
+      border-top: 2px solid var(--trilha-acc);
+      border-radius: 24px 24px 0 0;
+      padding: 0 18px 34px;
+      max-width: 500px; margin: 0 auto;
+      z-index: 160; max-height: 75vh; overflow-y: auto;
+      display: none;
+      box-shadow: 0 -6px 40px rgba(0,200,212,.15);
+    }
+    .sheet.on { display: block; }
+    .sheet-handle {
+      width: 40px; height: 4px; border-radius: 2px;
+      background: var(--trilha-bdr);
+      margin: 12px auto 16px;
+    }
+    .sheet-type-badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-family: 'Press Start 2P', monospace; font-size: 6px;
+      padding: 4px 9px; border-radius: 4px;
+      border: 1px solid currentColor;
+      margin-bottom: 10px;
+    }
+    .sheet-title {
+      font-family: 'Press Start 2P', monospace; font-size: 8px;
+      color: var(--trilha-text); line-height: 1.9;
+      margin-bottom: 12px; padding-right: 40px;
+    }
+    .sheet-desc { font-size: 14px; line-height: 1.75; color: #7AAABB; white-space: pre-wrap; }
+    .sheet-desc.empty { color: var(--trilha-muted); font-style: italic; font-size: 13px; }
+    .sheet-cta {
+      display: inline-flex; align-items: center; gap: 6px;
+      margin-top: 18px; padding: 11px 18px;
+      background: var(--trilha-acc); color: #010810;
+      text-decoration: none;
+      font-family: 'Press Start 2P', monospace; font-size: 7px;
+      border-radius: 999px;
+      border: none; cursor: pointer;
+    }
+    .sheet-cta:hover { background: var(--trilha-glow); }
+    .sheet-x {
+      position: absolute; top: 12px; right: 16px;
+      background: transparent; border: 1px solid var(--trilha-bdr);
+      color: var(--trilha-muted); padding: 5px 9px;
+      font-family: 'Press Start 2P', monospace; font-size: 7px;
+      cursor: pointer; border-radius: 4px;
+    }
+    .sheet-x:hover { border-color: var(--trilha-acc); color: var(--trilha-acc); }
+
+    /* ── TOAST ── */
+    #toast {
+      position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%) translateY(20px);
+      background: var(--trilha-bg2); border: 1.5px solid var(--trilha-bdr);
+      color: var(--trilha-text); font-size: 13px;
+      padding: 10px 18px; border-radius: 8px;
+      box-shadow: 0 4px 20px rgba(0,0,0,.5);
+      z-index: 200; opacity: 0; pointer-events: none;
+      transition: opacity .25s, transform .25s;
+      text-align: center; max-width: calc(100vw - 32px);
+    }
+    #toast.on { opacity: 1; transform: translateX(-50%) translateY(0); }
+
     /* ── TELA DE OFERTA ── */
-    #oferta-overlay { position: fixed; inset: 0; background: rgba(0,5,15,.95); display: flex; align-items: center; justify-content: center; z-index: 400; padding: 24px; opacity: 0; pointer-events: none; transition: opacity .5s; }
+    #oferta-overlay {
+      position: fixed; inset: 0; background: rgba(0,5,15,.95);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 400; padding: 24px; opacity: 0; pointer-events: none; transition: opacity .5s;
+    }
     #oferta-overlay.on { opacity: 1; pointer-events: auto; }
-    .oferta-box { background: var(--bg2); border: 3px solid var(--acc); padding: 36px 28px; width: 100%; max-width: 380px; text-align: center; box-shadow: 0 0 60px rgba(0,200,212,.35); }
+    .oferta-box {
+      background: var(--trilha-bg2); border: 3px solid var(--trilha-acc);
+      padding: 36px 28px; width: 100%; max-width: 380px; text-align: center;
+      box-shadow: 0 0 60px rgba(0,200,212,.3); border-radius: 12px;
+    }
     .oferta-star { font-size: 40px; display: block; margin-bottom: 12px; }
-    .oferta-title { font-family: 'Press Start 2P', monospace; font-size: 10px; color: var(--acc); line-height: 2; margin-bottom: 16px; text-shadow: 0 0 12px rgba(0,200,212,.6); }
-    .oferta-sub { font-size: 15px; color: var(--text); line-height: 1.7; margin-bottom: 24px; }
+    .oferta-title { font-family: 'Press Start 2P', monospace; font-size: 10px; color: var(--trilha-acc); line-height: 2; margin-bottom: 16px; text-shadow: 0 0 12px rgba(0,200,212,.6); }
+    .oferta-sub { font-size: 15px; color: var(--trilha-text); line-height: 1.7; margin-bottom: 24px; }
     .oferta-qr { background: #fff; padding: 12px; display: inline-block; margin-bottom: 20px; }
-    .oferta-cta { font-family: 'Press Start 2P', monospace; font-size: 8px; color: #010810; background: var(--acc); padding: 14px 20px; display: inline-block; cursor: pointer; }
-    .oferta-cta:hover { background: var(--glow); }
+    .oferta-cta { font-family: 'Press Start 2P', monospace; font-size: 8px; color: #010810; background: var(--trilha-acc); padding: 14px 20px; display: inline-block; cursor: pointer; border-radius: 999px; }
+    .oferta-cta:hover { background: var(--trilha-glow); }
 
     /* ── TELA DE NOME ── */
-    #name-overlay { position: fixed; inset: 0; background: var(--bg); display: flex; align-items: center; justify-content: center; z-index: 300; padding: 24px; }
+    #name-overlay { position: fixed; inset: 0; background: var(--trilha-bg); display: flex; align-items: center; justify-content: center; z-index: 300; padding: 24px; }
     #name-overlay.hidden { display: none; }
-    .name-box { background: var(--bg2); border: 2px solid var(--acc); padding: 36px 28px; width: 100%; max-width: 340px; text-align: center; box-shadow: 0 0 40px rgba(0,200,212,.25); }
-    .name-title { font-family: 'Press Start 2P', monospace; font-size: 9px; color: var(--acc); line-height: 2; margin-bottom: 24px; }
+    .name-box { background: var(--trilha-bg2); border: 2px solid var(--trilha-acc); padding: 36px 28px; width: 100%; max-width: 340px; text-align: center; box-shadow: 0 0 40px rgba(0,200,212,.22); border-radius: 12px; }
+    .name-title { font-family: 'Press Start 2P', monospace; font-size: 9px; color: var(--trilha-acc); line-height: 2; margin-bottom: 24px; }
     .name-sub { font-size: 13px; color: #7AAABB; margin-bottom: 20px; line-height: 1.6; }
-    .name-input { width: 100%; background: var(--bg); border: 2px solid var(--bdr); color: var(--text); padding: 12px; font-size: 16px; outline: none; text-align: center; margin-bottom: 16px; }
-    .name-input:focus { border-color: var(--acc); box-shadow: 0 0 10px rgba(0,200,212,.2); }
-    .name-btn { width: 100%; padding: 14px; background: var(--acc); color: #010810; border: none; font-family: 'Press Start 2P', monospace; font-size: 9px; cursor: pointer; }
-    .name-btn:hover { background: var(--glow); }
+    .name-input {
+      width: 100%; background: var(--trilha-bg); border: 2px solid var(--trilha-bdr);
+      color: var(--trilha-text); padding: 12px; font-size: 16px;
+      outline: none; text-align: center; margin-bottom: 16px; border-radius: 6px;
+    }
+    .name-input:focus { border-color: var(--trilha-acc); box-shadow: 0 0 10px rgba(0,200,212,.18); }
+    .name-btn { width: 100%; padding: 14px; background: var(--trilha-acc); color: #010810; border: none; font-family: 'Press Start 2P', monospace; font-size: 9px; cursor: pointer; border-radius: 999px; }
+    .name-btn:hover { background: var(--trilha-glow); }
 
-    /* ── SAUDAÇÃO NO HEADER ── */
-    .hdr-name { font-family: 'Press Start 2P', monospace; font-size: 7px; color: var(--acc); margin-top: 6px; text-shadow: 0 0 8px rgba(0,200,212,.5); }
+    /* ── NOTICE ── */
+    .notice { background: #001A20; border: 1px solid #005060; padding: 10px 14px; margin: 12px 16px 0; max-width: 500px; margin-left: auto; margin-right: auto; display: none; border-radius: 6px; }
+    .notice.on { display: block; }
+    .notice-txt { font-family: 'Press Start 2P', monospace; font-size: 7px; color: #0090A0; line-height: 1.9; }
 
-    /* ── DECORAÇÃO OCEÂNICA DO FUNDO ── */
+    /* ── OCEAN DECOR ── */
     .ocean-decor {
       position: fixed; bottom: 0; left: 0; right: 0; height: 80px;
-      background: linear-gradient(to top, rgba(0,40,60,.4), transparent);
+      background: linear-gradient(to top, rgba(0,40,60,.35), transparent);
       pointer-events: none; z-index: 0;
     }
   </style>
 </head>
-<body>
+<body class="trilha-root">
 
 <!-- TELA DE OFERTA -->
 <div id="oferta-overlay">
@@ -275,13 +445,21 @@
 
 <!-- HEADER -->
 <div class="hdr">
-  <div class="hdr-top">
-    <div class="hdr-title" id="hdrTitle">🌊 MERGULHANDO NA IA</div>
-    <div class="sync-dot" id="syncDot"></div>
+  <div class="hdr-inner">
+    <div class="hdr-row1">
+      <a class="hdr-back trilha-pixel" id="hdrBack" href="#" onclick="goBack(event)">
+        <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+        VOLTAR
+      </a>
+      <div class="hdr-title trilha-pixel" id="hdrTitle">🌊 MERGULHANDO NA IA</div>
+      <div class="hdr-live" id="syncDot"></div>
+    </div>
+    <div class="hdr-prog-bar"><div class="hdr-prog-fill" id="progFill"></div></div>
+    <div class="hdr-row2">
+      <span class="hdr-steps" id="progTxt">0 / 0 etapas liberadas</span>
+      <span class="hdr-name" id="hdrName"></span>
+    </div>
   </div>
-  <div class="prog-bar"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
-  <div class="prog-txt" id="progTxt">0 / 24 etapas liberadas</div>
-  <div class="hdr-name" id="hdrName"></div>
 </div>
 
 <!-- NOTICE sem Firebase -->
@@ -291,14 +469,14 @@
 
 <!-- TRAIL -->
 <div class="road-wrap" id="roadWrap">
-  <svg id="road-svg" viewBox="0 0 360 1300" xmlns="http://www.w3.org/2000/svg">
-    <!-- fundo gradiente oceânico atrás da estrada -->
+  <svg id="road-svg" viewBox="0 0 360 1300" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMin meet">
     <defs>
       <linearGradient id="oceanGrad" x1="0" y1="0" x2="0" y2="1">
         <stop offset="0%" stop-color="#020D14"/>
         <stop offset="100%" stop-color="#020D14"/>
       </linearGradient>
     </defs>
+    <!-- borda -->
     <path id="road-path"
       d="M 60 60 L 280 60
          A 55 80 0 0 1 280 220
@@ -316,6 +494,7 @@
          A 55 80 0 0 1 280 1180
          L 60 1180"
       stroke="#083858" stroke-width="56" fill="none" stroke-linecap="round"/>
+    <!-- corpo -->
     <path
       d="M 60 60 L 280 60
          A 55 80 0 0 1 280 220
@@ -333,6 +512,7 @@
          A 55 80 0 0 1 280 1180
          L 60 1180"
       stroke="#052840" stroke-width="50" fill="none" stroke-linecap="round"/>
+    <!-- tracejado ciano -->
     <path
       d="M 60 60 L 280 60
          A 55 80 0 0 1 280 220
@@ -350,7 +530,7 @@
          A 55 80 0 0 1 280 1180
          L 60 1180"
       stroke="#00C8D4" stroke-width="2" fill="none"
-      stroke-dasharray="14 14" stroke-linecap="butt" opacity="0.7"/>
+      stroke-dasharray="8 12" stroke-linecap="butt" opacity="0.65"/>
   </svg>
   <div id="items-layer"></div>
   <div id="char-layer"></div>
@@ -359,36 +539,65 @@
 <!-- BOTTOM SHEET -->
 <div class="sheet-bg" id="sheetBg" onclick="closeSheet()"></div>
 <div class="sheet" id="sheet">
+  <div class="sheet-handle"></div>
   <button class="sheet-x" onclick="closeSheet()">✕</button>
-  <span class="sheet-lbl" id="sheetLbl">CHECKPOINT</span>
-  <div id="sheetDesc" class="sheet-desc empty">sem instruções ainda</div>
-  <a id="sheetLink" href="#" target="_blank" class="sheet-link" style="display:none">ACESSAR →</a>
+  <div id="sheetTypeBadge" class="sheet-type-badge" style="display:none"></div>
+  <div class="sheet-title" id="sheetTitle"></div>
+  <div id="sheetDesc" class="sheet-desc empty">sem conteúdo</div>
+  <a id="sheetCta" href="#" target="_blank" rel="noopener" class="sheet-cta" style="display:none">ABRIR LINK →</a>
 </div>
+
+<!-- TOAST -->
+<div id="toast"></div>
 
 <!-- decoração de fundo -->
 <div class="ocean-decor"></div>
 
 <script>
 // ════════════════════════════════════
+//  ⚙ CONFIGURAÇÃO
+// ════════════════════════════════════
+const CFG = {
+  title:   "🌊 MERGULHANDO NA IA",
+  backUrl: "/",                            // URL do botão Voltar
+  firebase: {
+    url:  "https://passo-a-passo-eventos-default-rtdb.firebaseio.com",
+    path: "/trilha.json"
+  }
+};
+
+// ════════════════════════════════════
 //  BOLHAS DECORATIVAS
 // ════════════════════════════════════
-function spawnBubbles(){
-  const count = 12;
-  for (let i = 0; i < count; i++){
+(function spawnBubbles(){
+  for (let i = 0; i < 12; i++){
     const b = document.createElement('div');
     b.className = 'bubble';
-    const size = 4 + Math.random() * 12;
+    const size = 4 + Math.random() * 14;
     b.style.cssText = [
       `width:${size}px`, `height:${size}px`,
       `left:${Math.random()*100}%`,
       `bottom:${Math.random()*30}%`,
-      `animation-duration:${6 + Math.random()*10}s`,
-      `animation-delay:${Math.random()*8}s`
+      `animation-duration:${7 + Math.random()*9}s`,
+      `animation-delay:${Math.random()*9}s`
     ].join(';');
     document.body.appendChild(b);
   }
-}
-spawnBubbles();
+})();
+
+// ════════════════════════════════════
+//  PALETA POR TIPO
+// ════════════════════════════════════
+const TC = {
+  PDF:      { c:'#FF7B72', bg:'#200A0A' },
+  Aula:     { c:'#00C8D4', bg:'#00262A' },
+  Doc:      { c:'#56D364', bg:'#082010' },
+  Site:     { c:'#7ECFFF', bg:'#001830' },
+  Skill:    { c:'#FF9A50', bg:'#201000' },
+  Planilha: { c:'#39D4C5', bg:'#002020' },
+  Prompt:   { c:'#F778BA', bg:'#200818' },
+};
+const TE = { PDF:'🐚', Aula:'🐬', Doc:'🐠', Site:'🦑', Skill:'🦀', Planilha:'🐙', Prompt:'⚓' };
 
 // ════════════════════════════════════
 //  FAQ
@@ -396,17 +605,27 @@ spawnBubbles();
 const FAQ_ITEMS = [
   {
     q: "Me perdi, onde ele está agora?",
-    a: 'Clique na <a href="#" onclick="scrollToChar();return false;" style="color:#00C8D4;text-decoration:underline;font-weight:bold">SEREIA</a> e descubra onde estamos.'
+    a: "__SEREIA__"
   },
   {
     q: "Onde está o link dos materiais?",
-    a: 'O link dos materiais está aqui: <a href="http://vtsd.com.br/materiais-ia" target="_blank" style="color:#00C8D4;text-decoration:underline">vtsd.com.br/materiais-ia</a>'
+    a: "O link dos materiais está aqui:\n__LINK__http://vtsd.com.br/materiais-ia__vtsd.com.br/materiais-ia/LINK__"
   },
   {
     q: "A trilha não atualiza, o que faço?",
     a: "Atualize a página."
   },
 ];
+
+function renderFaqAnswer(raw){
+  return raw
+    .replace(/__SEREIA__/g,
+      '<a href="#" onclick="scrollToLeandro();return false;" style="color:#00C8D4;text-decoration:underline;font-weight:bold">clique na SEREIA</a> para ir até onde estamos agora.')
+    .replace(/__VOLTAR__/g,
+      `<a href="${CFG.backUrl}" style="color:#00C8D4;text-decoration:underline">voltar ao evento</a>`)
+    .replace(/__LINK__([^_]+)__([^/]+)\/LINK__/g,
+      '<a href="$1" target="_blank" rel="noopener" style="color:#00C8D4;text-decoration:underline">$2</a>');
+}
 
 function buildFaq(){
   const list = document.getElementById('faq-list');
@@ -419,31 +638,30 @@ function buildFaq(){
         `<span>${item.q}</span>` +
         `<span class="faq-arrow">▶</span>` +
       `</button>` +
-      `<div class="faq-a">${item.a}</div>`;
+      `<div class="faq-a">${renderFaqAnswer(item.a)}</div>`;
     list.appendChild(el);
   });
 }
-
 function toggleFaqItem(i){
-  const items = document.querySelectorAll('.faq-item');
-  items.forEach((el, idx) => {
-    if (idx === i) el.classList.toggle('open');
-    else el.classList.remove('open');
+  document.querySelectorAll('.faq-item').forEach((el,idx) => {
+    el.classList.toggle('open', idx === i && !el.classList.contains('open'));
   });
 }
-
-function toggleFaq(){
-  document.getElementById('faq-panel').classList.toggle('on');
-}
-
+function toggleFaq(){ document.getElementById('faq-panel').classList.toggle('on'); }
 buildFaq();
 
-function scrollToChar(){
+function scrollToLeandro(){
   document.getElementById('faq-panel').classList.remove('on');
   const char = document.getElementById('trail-char');
-  if (char){
-    char.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  }
+  if (char) char.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+// ════════════════════════════════════
+//  BACK
+// ════════════════════════════════════
+function goBack(e){
+  e.preventDefault();
+  if (CFG.backUrl && CFG.backUrl !== '/') window.location.href = CFG.backUrl;
 }
 
 // ════════════════════════════════════
@@ -451,13 +669,10 @@ function scrollToChar(){
 // ════════════════════════════════════
 function checkName(){
   const name = localStorage.getItem('trilha_name');
-  if (name) { applyName(name); }
-  else { document.getElementById('name-overlay').classList.remove('hidden'); }
-  document.getElementById('nameInput').addEventListener('keydown', e => {
-    if (e.key === 'Enter') saveName();
-  });
+  if (name) applyName(name);
+  else document.getElementById('name-overlay').classList.remove('hidden');
+  document.getElementById('nameInput').addEventListener('keydown', e => { if (e.key==='Enter') saveName(); });
 }
-
 function saveName(){
   const val = document.getElementById('nameInput').value.trim();
   if (!val) return;
@@ -465,10 +680,21 @@ function saveName(){
   applyName(val);
   document.getElementById('name-overlay').classList.add('hidden');
 }
-
 function applyName(name){
   const el = document.getElementById('hdrName');
-  if (el) el.textContent = `🌊 OI, ${name.toUpperCase()}!`;
+  if (el) el.textContent = `OI, ${name.toUpperCase()}!`;
+}
+
+// ════════════════════════════════════
+//  TOAST
+// ════════════════════════════════════
+let toastTimer;
+function showToast(msg, ms = 3200){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('on');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('on'), ms);
 }
 
 // ════════════════════════════════════
@@ -477,87 +703,32 @@ function applyName(name){
 function playStepSound(){
   try {
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    [[523,.0],[659,.12],[784,.24]].forEach(([freq, delay]) => {
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
+    [[523,.0],[659,.12],[784,.24]].forEach(([freq,delay]) => {
+      const osc = ctx.createOscillator(), gain = ctx.createGain();
       osc.connect(gain); gain.connect(ctx.destination);
       osc.type = 'sine'; osc.frequency.value = freq;
       const t = ctx.currentTime + delay;
       gain.gain.setValueAtTime(0, t);
-      gain.gain.linearRampToValueAtTime(0.25, t + 0.02);
+      gain.gain.linearRampToValueAtTime(0.22, t + 0.02);
       gain.gain.exponentialRampToValueAtTime(0.001, t + 0.35);
       osc.start(t); osc.stop(t + 0.35);
     });
-  } catch(e) {}
+  } catch(e){}
 }
-
-// ════════════════════════════════════
-//  ⚙ CONFIGURAÇÃO
-// ════════════════════════════════════
-const CFG = {
-  title:    "🌊 MERGULHANDO NA IA — DIA 03",
-  firebase: {
-    url:  "https://passo-a-passo-eventos-default-rtdb.firebaseio.com",
-    path: "/trilha.json"
-  }
-};
-
-// ════════════════════════════════════
-//  ETAPAS — carregadas do Firebase
-// ════════════════════════════════════
-let STEPS = [];
-let CPS = [];
-let TITLES = {};
-function getTitle(id){
-  return TITLES[id] !== undefined ? TITLES[id] : (STEPS.find(s=>s.id===id)||{}).title||'';
-}
-
-// ════════════════════════════════════
-//  TYPE COLOURS — paleta oceânica
-// ════════════════════════════════════
-const TC = {
-  PDF:      { c:"#FF7B72", bg:"#200A0A" },
-  Aula:     { c:"#00C8D4", bg:"#00262A" },
-  Doc:      { c:"#56D364", bg:"#082010" },
-  Site:     { c:"#7ECFFF", bg:"#001830" },
-  Skill:    { c:"#FF9A50", bg:"#201000" },
-  Planilha: { c:"#39D4C5", bg:"#002020" },
-  Prompt:   { c:"#F778BA", bg:"#200818" },
-};
-
-// emojis temáticos oceânico/IA
-const TE = {
-  PDF:'🐚', Aula:'🐬', Doc:'🐠', Site:'🦑',
-  Skill:'🦀', Planilha:'🐙', Prompt:'⚓',
-};
 
 // ════════════════════════════════════
 //  STATE
 // ════════════════════════════════════
-let unlocked    = 0;
-let activeSheet = null;
-let syncLive    = false;
-const isFB      = !!CFG.firebase.url;
+let STEPS    = [];
+let CPS      = [];
+let TITLES   = {};
+let unlocked = 0;
+let syncLive = false;
+const isFB   = !!CFG.firebase.url;
 
-// ════════════════════════════════════
-//  UTILS
-// ════════════════════════════════════
+function getTitle(id){ return TITLES[id] !== undefined ? TITLES[id] : (STEPS.find(s=>s.id===id)||{}).title||''; }
 function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-
-function getScale(){
-  const s = document.getElementById('road-svg');
-  return s ? s.getBoundingClientRect().width / 360 : 1;
-}
-
-function leftNormal(path, t){
-  const tot = path.getTotalLength();
-  const dt  = 4;
-  const p0  = path.getPointAtLength(Math.max(0, t - dt));
-  const p1  = path.getPointAtLength(Math.min(tot, t + dt));
-  const dx  = p1.x - p0.x, dy = p1.y - p0.y;
-  const len = Math.sqrt(dx*dx + dy*dy) || 1;
-  return { x: -dy/len, y: dx/len };
-}
+function getScale(){ const s = document.getElementById('road-svg'); return s ? s.getBoundingClientRect().width / 360 : 1; }
 
 // ════════════════════════════════════
 //  BUILD TRAIL
@@ -573,7 +744,7 @@ function buildTrail(){
     return;
   }
 
-  document.getElementById('progFill').style.width = Math.round(unlocked/STEPS.length*100)+'%';
+  document.getElementById('progFill').style.width = Math.round(unlocked / STEPS.length * 100) + '%';
   document.getElementById('progTxt').textContent  = `${unlocked} / ${STEPS.length} etapas liberadas`;
 
   const path  = document.getElementById('road-path');
@@ -585,115 +756,107 @@ function buildTrail(){
   const N = STEPS.length * 2 + 1;
 
   for (let i = 0; i < N; i++){
-    const t    = (i / (N-1)) * total;
-    const pt   = path.getPointAtLength(t);
-    const sx   = pt.x * scale;
-    const sy   = pt.y * scale;
+    const t  = (i / (N-1)) * total;
+    const pt = path.getPointAtLength(t);
+    const sx = pt.x * scale;
+    const sy = pt.y * scale;
 
     if (i === 0){
-      const el = mk('div','trail-flag');
-      el.style.cssText = `left:${sx}px;top:${sy}px;cursor:pointer;pointer-events:auto`;
-      el.innerHTML = `<span class="flag-txt">🌊 INÍCIO</span>`;
-      el.addEventListener('click', () => {
-        activeSheet = null;
-        document.getElementById('sheetLbl').textContent = '🌊 JÁ COMEÇAMOS!';
-        const d = document.getElementById('sheetDesc');
-        d.className = 'sheet-desc';
-        d.textContent = 'Já começamos, procure o Leandro Sereio pelo caminho e acompanhe a gente!';
-        document.getElementById('sheetLink').style.display = 'none';
-        document.getElementById('sheetBg').classList.add('on');
-        document.getElementById('sheet').classList.add('on');
-      });
+      // INÍCIO
+      const el = document.createElement('div');
+      el.className = 'marker-pill start';
+      el.style.cssText = `left:${sx}px;top:${sy}px`;
+      el.innerHTML = `🌊 INÍCIO`;
       layer.appendChild(el);
 
-    } else if (i === N-1){
+    } else if (i === N - 1){
+      // CHEGADA
       const done = unlocked >= STEPS.length;
-      const el   = mk('div','trail-flag');
-      el.style.cssText = `left:${sx}px;top:${sy}px;opacity:${done?1:.3}`;
-      el.innerHTML = `<span class="flag-icon">${done?'🏆':'🎯'}</span><span class="flag-txt">${done?'MISSÃO CUMPRIDA!':'CHEGADA'}</span>`;
+      const el = document.createElement('div');
+      el.className = `marker-pill end${done?' done':''}`;
+      el.style.cssText = `left:${sx}px;top:${sy}px`;
+      el.innerHTML = `<span class="end-icon">${done?'🏆':'🎯'}</span><span class="end-label trilha-pixel">${done?'MISSÃO CUMPRIDA!':'CHEGADA'}</span>`;
       layer.appendChild(el);
 
     } else if (i % 2 === 1){
-      const si   = Math.floor(i/2);
+      // PARADA (stop)
+      const si   = Math.floor(i / 2);
       const s    = STEPS[si];
-      const t2   = TC[s.type] || {c:'#00C8D4',bg:'#002020'};
+      const t2   = TC[s.type] || { c:'#00C8D4', bg:'#002020' };
       const isOn = si < unlocked;
+      const emoji = TE[s.type] || '🐚';
 
-      const dot = mk('div', 'stop-dot' + (isOn ? '' : ' off'));
-      dot.style.cssText = `left:${sx}px;top:${sy}px;${isOn?'background:'+t2.c+';box-shadow:0 0 8px '+t2.c:''}`;
-      layer.appendChild(dot);
-
-      const emoji = mk('div', 'stop-emoji');
-      emoji.style.cssText = `left:${sx}px;top:${sy}px`;
-      emoji.textContent = TE[s.type] || '🐚';
-      emoji.addEventListener('click', () => {
+      const btn = document.createElement('div');
+      btn.className = `stop-btn${isOn ? '' : ' locked'}`;
+      btn.style.cssText = `left:${sx}px;top:${sy}px;pointer-events:auto;` +
+        (isOn ? `border-color:${t2.c};box-shadow:0 0 14px ${t2.c}88,0 0 28px ${t2.c}44;` : '');
+      btn.setAttribute('aria-label', isOn ? s.title : 'Etapa bloqueada');
+      btn.innerHTML = `<span class="stop-emoji">${isOn ? emoji : '🐚'}</span>`;
+      btn.addEventListener('click', () => {
         if (isOn) openStepSheet(s.id);
-        else openLockedMsg();
+        else showToast('Calma, não chegamos nessa parte ainda. Clique na sereia 🧜');
       });
-      layer.appendChild(emoji);
+      layer.appendChild(btn);
 
     } else {
+      // CHECKPOINT
       const cpId   = i / 2;
-      const cp     = CPS.find(c=>c.id===cpId) || {desc:'',link:''};
+      const cp     = CPS.find(c => c.id === cpId) || { desc:'', link:'' };
       const locked = unlocked < cpId;
 
-      if (cp.desc){
-        const wrap = mk('div','cp-item');
-        wrap.style.cssText = `left:${sx}px;top:${sy}px`;
-        const sq = mk('div',`cp-sq${locked?' cp-lock':' has-c'}`);
-        sq.innerHTML = `<span class="cp-ico">🌀</span>`;
-        if (!locked) sq.addEventListener('click', ()=>openSheet(cpId));
-        wrap.appendChild(sq);
-        layer.appendChild(wrap);
+      const pill = document.createElement('div');
+      pill.className = `cp-pill${locked ? ' locked' : (cp.desc ? ' unlocked' : ' locked')}`;
+      pill.style.cssText = `left:${sx}px;top:${sy}px`;
+      pill.setAttribute('aria-label', locked ? 'Checkpoint bloqueado' : 'Checkpoint');
+      pill.innerHTML = locked || !cp.desc ? '🐚' : '📋 CHECKPOINT';
+      if (!locked && cp.desc){
+        pill.addEventListener('click', () => openCpSheet(cpId));
       }
+      layer.appendChild(pill);
     }
   }
-}
-
-function mk(tag, cls){
-  const el = document.createElement(tag);
-  el.className = cls;
-  return el;
 }
 
 // ════════════════════════════════════
 //  BOTTOM SHEET
 // ════════════════════════════════════
-function openSheet(cpId){
-  const cp = CPS.find(c=>c.id===cpId) || {desc:'',link:''};
-  const s  = STEPS.find(x=>x.id===cpId);
-  activeSheet = cpId;
+function openStepSheet(stepId){
+  const s = STEPS.find(x => x.id === stepId);
+  if (!s) return;
+  const t = TC[s.type] || { c:'#00C8D4', bg:'#002020' };
 
-  const cpLabel = cp.name || (s ? s.title : '');
-  document.getElementById('sheetLbl').textContent =
-    `🌀 CP ${String(cpId).padStart(2,'0')} — ${cpLabel.toUpperCase()}`;
+  const badge = document.getElementById('sheetTypeBadge');
+  badge.style.cssText = `display:inline-flex;background:${t.bg};color:${t.c};border-color:${t.c}`;
+  badge.textContent = `${TE[s.type]||''} ${s.type.toUpperCase()}`;
+
+  document.getElementById('sheetTitle').textContent = getTitle(stepId);
+
+  const d = document.getElementById('sheetDesc');
+  d.className = s.text ? 'sheet-desc' : 'sheet-desc empty';
+  d.textContent = s.text || 'sem descrição';
+
+  document.getElementById('sheetCta').style.display = 'none';
+  document.getElementById('sheetBg').classList.add('on');
+  document.getElementById('sheet').classList.add('on');
+}
+
+function openCpSheet(cpId){
+  const cp = CPS.find(c => c.id === cpId) || { name:'', desc:'', link:'' };
+
+  const badge = document.getElementById('sheetTypeBadge');
+  badge.style.cssText = `display:inline-flex;background:rgba(255,122,32,.15);color:#FF7A20;border-color:#FF7A20`;
+  badge.textContent = '📋 CHECKPOINT';
+
+  document.getElementById('sheetTitle').textContent = cp.name || `Checkpoint ${cpId}`;
 
   const d = document.getElementById('sheetDesc');
   d.className = cp.desc ? 'sheet-desc' : 'sheet-desc empty';
   d.textContent = cp.desc || 'sem instruções ainda';
 
-  const a = document.getElementById('sheetLink');
-  if (cp.link){ a.href = cp.link; a.style.display='inline-flex'; }
-  else { a.style.display='none'; }
+  const cta = document.getElementById('sheetCta');
+  if (cp.link){ cta.href = cp.link; cta.style.display = 'inline-flex'; }
+  else cta.style.display = 'none';
 
-  document.getElementById('sheetBg').classList.add('on');
-  document.getElementById('sheet').classList.add('on');
-}
-
-function openStepSheet(stepId){
-  const s = STEPS.find(x => x.id === stepId);
-  if (!s) return;
-  const t = TC[s.type] || {c:'#00C8D4',bg:'#002020'};
-  activeSheet = null;
-
-  document.getElementById('sheetLbl').innerHTML =
-    `<span style="background:${t.bg};color:${t.c};padding:2px 6px;font-size:5px;border:1px solid ${t.c}">${s.type.toUpperCase()}</span>  ${esc(getTitle(stepId))}`;
-
-  const d = document.getElementById('sheetDesc');
-  d.className = 'sheet-desc';
-  d.textContent = s.text;
-
-  document.getElementById('sheetLink').style.display = 'none';
   document.getElementById('sheetBg').classList.add('on');
   document.getElementById('sheet').classList.add('on');
 }
@@ -701,94 +864,56 @@ function openStepSheet(stepId){
 function closeSheet(){
   document.getElementById('sheetBg').classList.remove('on');
   document.getElementById('sheet').classList.remove('on');
-  activeSheet = null;
-}
-
-function openLockedMsg(){
-  activeSheet = null;
-  document.getElementById('sheetLbl').textContent = '🔒 ZONA BLOQUEADA';
-  const d = document.getElementById('sheetDesc');
-  d.className = 'sheet-desc';
-  d.textContent = 'Ainda não chegamos aqui. Aguarda, o mergulho continua!';
-  document.getElementById('sheetLink').style.display = 'none';
-  document.getElementById('sheetBg').classList.add('on');
-  document.getElementById('sheet').classList.add('on');
 }
 
 // ════════════════════════════════════
-//  PERSONAGEM — CARANGUEJO PIXEL ART
-//  (inspirado no Leandro das imagens)
+//  PERSONAGEM — SVG pixel art
 // ════════════════════════════════════
-const CHAR_SVG = `
+const CHAR_SVG_LEANDRO = `
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 36" width="45" height="90" shape-rendering="crispEdges">
-  <!-- cabelo cacheado esquerda -->
   <rect x="0" y="3" width="3" height="8" fill="#1E0F00"/>
   <rect x="0" y="5" width="2" height="5" fill="#2E1A00"/>
-  <!-- cabelo cacheado direita -->
   <rect x="15" y="3" width="3" height="8" fill="#1E0F00"/>
   <rect x="16" y="5" width="2" height="5" fill="#2E1A00"/>
-  <!-- topo da cabeça / cabelo -->
   <rect x="2" y="0" width="14" height="3" fill="#1E0F00"/>
   <rect x="3" y="1" width="12" height="4" fill="#2E1A00"/>
   <rect x="1" y="2" width="3" height="5" fill="#1E0F00"/>
   <rect x="14" y="2" width="3" height="5" fill="#1E0F00"/>
-  <!-- rosto (pele mais clara) -->
   <rect x="3" y="4" width="12" height="8" fill="#E8B08A"/>
-  <!-- sobrancelhas preocupadas -->
   <rect x="4" y="5" width="4" height="1" fill="#1E0F00"/>
   <rect x="10" y="5" width="4" height="1" fill="#1E0F00"/>
-  <rect x="4" y="4" width="1" height="1" fill="#1E0F00"/>
-  <rect x="13" y="4" width="1" height="1" fill="#1E0F00"/>
-  <!-- olhos arregalados -->
   <rect x="4" y="6" width="4" height="3" fill="#1A1A1A"/>
   <rect x="10" y="6" width="4" height="3" fill="#1A1A1A"/>
   <rect x="4" y="6" width="2" height="2" fill="#FFF"/>
   <rect x="11" y="6" width="2" height="2" fill="#FFF"/>
   <rect x="5" y="7" width="1" height="1" fill="#000"/>
   <rect x="12" y="7" width="1" height="1" fill="#000"/>
-  <!-- nariz -->
   <rect x="8" y="9" width="2" height="1" fill="#C07860"/>
-  <!-- boca aberta (surpreso) -->
   <rect x="6" y="10" width="6" height="1" fill="#C07860"/>
   <rect x="7" y="11" width="4" height="1" fill="#7A2020"/>
-  <!-- pescoço / barriga (sem barba, pele clara) -->
-  <rect x="5" y="12" width="8" height="3" fill="#E8B08A"/>
-  <rect x="5" y="15" width="8" height="2" fill="#E8B08A"/>
-  <!-- top de conchas (esquerda) -->
+  <rect x="5" y="12" width="8" height="5" fill="#E8B08A"/>
   <rect x="2" y="17" width="6" height="4" fill="#C8A0D8"/>
   <rect x="3" y="18" width="4" height="2" fill="#B088C8"/>
   <rect x="2" y="17" width="6" height="1" fill="#E0C0F0"/>
-  <!-- top de conchas (direita) -->
   <rect x="10" y="17" width="6" height="4" fill="#C8A0D8"/>
   <rect x="11" y="18" width="4" height="2" fill="#B088C8"/>
   <rect x="10" y="17" width="6" height="1" fill="#E0C0F0"/>
-  <!-- centro do top -->
   <rect x="8" y="18" width="2" height="2" fill="#F0D0FF"/>
-  <!-- braços -->
   <rect x="0" y="17" width="2" height="6" fill="#E8B08A"/>
   <rect x="16" y="17" width="2" height="6" fill="#E8B08A"/>
   <rect x="0" y="22" width="3" height="2" fill="#E8B08A"/>
   <rect x="15" y="22" width="3" height="2" fill="#E8B08A"/>
-  <!-- barriga (plump, como na imagem) -->
   <rect x="3" y="21" width="12" height="4" fill="#E8B08A"/>
   <rect x="2" y="22" width="14" height="2" fill="#E8B08A"/>
-  <!-- cintura / escamas início -->
   <rect x="3" y="25" width="12" height="1" fill="#089898"/>
-  <!-- cauda escamas (teal iridescente) -->
   <rect x="4" y="26" width="10" height="3" fill="#0AB8B8"/>
   <rect x="5" y="27" width="8" height="2" fill="#0ACACA"/>
-  <!-- padrão de escamas -->
   <rect x="4" y="26" width="3" height="1" fill="#089090"/>
   <rect x="8" y="26" width="3" height="1" fill="#089090"/>
-  <rect x="12" y="26" width="2" height="1" fill="#089090"/>
   <rect x="5" y="28" width="3" height="1" fill="#089090"/>
   <rect x="9" y="28" width="3" height="1" fill="#089090"/>
   <rect x="4" y="29" width="10" height="3" fill="#0AB8B8"/>
   <rect x="3" y="30" width="12" height="2" fill="#0ACACA"/>
-  <rect x="3" y="30" width="3" height="1" fill="#089090"/>
-  <rect x="7" y="30" width="3" height="1" fill="#089090"/>
-  <rect x="11" y="30" width="3" height="1" fill="#089090"/>
-  <!-- nadadeira (fin) -->
   <rect x="1" y="32" width="6" height="2" fill="#0ACACA"/>
   <rect x="11" y="32" width="6" height="2" fill="#0ACACA"/>
   <rect x="0" y="33" width="5" height="2" fill="#089090"/>
@@ -796,70 +921,160 @@ const CHAR_SVG = `
   <rect x="6" y="32" width="6" height="1" fill="#067070"/>
 </svg>`;
 
-function initCharacter(){
+// Ruy Sereia — cauda verde
+const CHAR_SVG_RUY = `
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 36" width="42" height="84" shape-rendering="crispEdges">
+  <rect x="2" y="0" width="14" height="3" fill="#0A1A0A"/>
+  <rect x="3" y="1" width="12" height="4" fill="#153015"/>
+  <rect x="1" y="2" width="3" height="5" fill="#0A1A0A"/>
+  <rect x="14" y="2" width="3" height="5" fill="#0A1A0A"/>
+  <rect x="0" y="3" width="3" height="7" fill="#0A1A0A"/>
+  <rect x="15" y="3" width="3" height="7" fill="#0A1A0A"/>
+  <rect x="3" y="4" width="12" height="8" fill="#D4A87A"/>
+  <rect x="4" y="5" width="4" height="1" fill="#0A1A0A"/>
+  <rect x="10" y="5" width="4" height="1" fill="#0A1A0A"/>
+  <rect x="4" y="6" width="4" height="3" fill="#1A1A1A"/>
+  <rect x="10" y="6" width="4" height="3" fill="#1A1A1A"/>
+  <rect x="4" y="6" width="2" height="2" fill="#FFF"/>
+  <rect x="11" y="6" width="2" height="2" fill="#FFF"/>
+  <rect x="5" y="7" width="1" height="1" fill="#000"/>
+  <rect x="12" y="7" width="1" height="1" fill="#000"/>
+  <rect x="8" y="9" width="2" height="1" fill="#B07050"/>
+  <rect x="6" y="10" width="6" height="2" fill="#B07050"/>
+  <rect x="5" y="12" width="8" height="5" fill="#D4A87A"/>
+  <rect x="4" y="11" width="2" height="3" fill="#8B5E3C"/>
+  <rect x="12" y="11" width="2" height="3" fill="#8B5E3C"/>
+  <rect x="3" y="13" width="2" height="2" fill="#7A5030"/>
+  <rect x="13" y="13" width="2" height="2" fill="#7A5030"/>
+  <rect x="2" y="17" width="6" height="4" fill="#1A6B3A"/>
+  <rect x="3" y="18" width="4" height="2" fill="#145530"/>
+  <rect x="2" y="17" width="6" height="1" fill="#2A9050"/>
+  <rect x="10" y="17" width="6" height="4" fill="#1A6B3A"/>
+  <rect x="11" y="18" width="4" height="2" fill="#145530"/>
+  <rect x="10" y="17" width="6" height="1" fill="#2A9050"/>
+  <rect x="8" y="18" width="2" height="2" fill="#3AB060"/>
+  <rect x="0" y="17" width="2" height="6" fill="#D4A87A"/>
+  <rect x="16" y="17" width="2" height="6" fill="#D4A87A"/>
+  <rect x="0" y="22" width="3" height="2" fill="#D4A87A"/>
+  <rect x="15" y="22" width="3" height="2" fill="#D4A87A"/>
+  <rect x="3" y="21" width="12" height="4" fill="#D4A87A"/>
+  <rect x="2" y="22" width="14" height="2" fill="#D4A87A"/>
+  <rect x="3" y="25" width="12" height="1" fill="#1A8040"/>
+  <rect x="4" y="26" width="10" height="3" fill="#22A050"/>
+  <rect x="5" y="27" width="8" height="2" fill="#28BB5A"/>
+  <rect x="4" y="26" width="3" height="1" fill="#1A8040"/>
+  <rect x="8" y="26" width="3" height="1" fill="#1A8040"/>
+  <rect x="5" y="28" width="3" height="1" fill="#1A8040"/>
+  <rect x="9" y="28" width="3" height="1" fill="#1A8040"/>
+  <rect x="4" y="29" width="10" height="3" fill="#22A050"/>
+  <rect x="3" y="30" width="12" height="2" fill="#28BB5A"/>
+  <rect x="1" y="32" width="6" height="2" fill="#28BB5A"/>
+  <rect x="11" y="32" width="6" height="2" fill="#28BB5A"/>
+  <rect x="0" y="33" width="5" height="2" fill="#1A8040"/>
+  <rect x="13" y="33" width="5" height="2" fill="#1A8040"/>
+  <rect x="6" y="32" width="6" height="1" fill="#156030"/>
+</svg>`;
+
+function initCharacters(){
   const layer = document.getElementById('char-layer');
-  if (document.getElementById('trail-char')) return;
-  const wrap = document.createElement('div');
-  wrap.id = 'trail-char';
-  wrap.style.pointerEvents = 'auto';
-  wrap.style.cursor = 'pointer';
-  wrap.title = 'Clique para ver onde estamos';
-  wrap.addEventListener('click', () => {
-    if (STEPS.length === 0) return;
-    if (unlocked === 0) {
-      activeSheet = null;
-      document.getElementById('sheetLbl').textContent = '🌊 PRONTOS PARA MERGULHAR?';
-      const d = document.getElementById('sheetDesc');
-      d.className = 'sheet-desc';
-      d.textContent = 'Vamos começar já!';
-      document.getElementById('sheetLink').style.display = 'none';
-      document.getElementById('sheetBg').classList.add('on');
-      document.getElementById('sheet').classList.add('on');
-    } else {
-      const idx = Math.min(unlocked - 1, STEPS.length - 1);
-      openStepSheet(STEPS[idx].id);
-    }
-  });
-  const label = document.createElement('div');
-  label.style.cssText = [
-    'position:absolute',
-    'top:-108px',
-    'left:50%',
-    'transform:translateX(-50%)',
-    'background:#00C8D4',
-    'color:#010810',
-    "font-family:'Press Start 2P',monospace",
-    'font-size:6px',
-    'padding:3px 6px',
-    'white-space:nowrap',
-    'pointer-events:none',
-    'z-index:11',
-    'box-shadow:0 0 10px rgba(0,200,212,.5)'
-  ].join(';');
-  label.textContent = 'LEANDRO';
-  const inner = document.createElement('div');
-  inner.className = 'char-inner';
-  inner.innerHTML = CHAR_SVG;
-  wrap.appendChild(label);
-  wrap.appendChild(inner);
-  layer.appendChild(wrap);
-  updateCharacter(false);
+
+  // Ruy — fixo
+  if (!document.getElementById('trail-ruy')){
+    const wrap = document.createElement('div');
+    wrap.id = 'trail-ruy';
+    wrap.style.pointerEvents = 'auto';
+    wrap.style.cursor = 'pointer';
+    wrap.title = 'Ruy Sereia';
+    wrap.addEventListener('click', () => {
+      showToast('Oi! Sou o Ruy. Procura o Leandro para acompanhar onde estamos! 🧜');
+    });
+    const badge = document.createElement('div');
+    badge.className = 'char-badge ruy';
+    badge.textContent = 'RUY';
+    const inner = document.createElement('div');
+    inner.className = 'char-inner ruy';
+    inner.innerHTML = CHAR_SVG_RUY;
+    wrap.appendChild(badge);
+    wrap.appendChild(inner);
+    layer.appendChild(wrap);
+  }
+
+  // Leandro — móvel
+  if (!document.getElementById('trail-char')){
+    const wrap = document.createElement('div');
+    wrap.id = 'trail-char';
+    wrap.style.pointerEvents = 'auto';
+    wrap.style.cursor = 'pointer';
+    wrap.title = 'Clique para ver onde estamos';
+    wrap.addEventListener('click', () => {
+      if (STEPS.length === 0) return;
+      if (unlocked === 0){
+        document.getElementById('sheetTypeBadge').style.display = 'none';
+        document.getElementById('sheetTitle').textContent = '🌊 PRONTOS PARA MERGULHAR?';
+        const d = document.getElementById('sheetDesc');
+        d.className = 'sheet-desc';
+        d.textContent = 'Vamos começar já!';
+        document.getElementById('sheetCta').style.display = 'none';
+        document.getElementById('sheetBg').classList.add('on');
+        document.getElementById('sheet').classList.add('on');
+      } else {
+        openStepSheet(STEPS[Math.min(unlocked - 1, STEPS.length - 1)].id);
+      }
+    });
+    const badge = document.createElement('div');
+    badge.className = 'char-badge leandro';
+    badge.textContent = 'LEANDRO';
+    const inner = document.createElement('div');
+    inner.className = 'char-inner leandro';
+    inner.innerHTML = CHAR_SVG_LEANDRO;
+    wrap.appendChild(badge);
+    wrap.appendChild(inner);
+    layer.appendChild(wrap);
+  }
+
+  updateCharacters(false);
 }
 
-function updateCharacter(animate = true){
-  const char = document.getElementById('trail-char');
-  if (!char) return;
+function updateCharacters(animate = true){
   const path  = document.getElementById('road-path');
   const total = path.getTotalLength();
   const N     = STEPS.length > 0 ? STEPS.length * 2 + 1 : 3;
   const scale = getScale();
 
-  const idx = unlocked === 0 ? 0 : Math.min(2 * unlocked - 1, N - 2);
-  const t   = (idx / (N-1)) * total;
-  const pt  = path.getPointAtLength(t);
+  // Ruy — fixo na 4ª etapa
+  const ruy = document.getElementById('trail-ruy');
+  if (ruy && STEPS.length > 0){
+    const ruyStepIdx = Math.min(3, STEPS.length - 1);  // step index 0-based
+    const ruyMarker  = 1 + ruyStepIdx * 2;             // odd marker index
+    const ruyT       = (ruyMarker / (N-1)) * total;
+    const ruyPt      = path.getPointAtLength(ruyT);
+    ruy.style.left = (ruyPt.x * scale) + 'px';
+    ruy.style.top  = (ruyPt.y * scale) + 'px';
+  }
 
-  char.style.left = (pt.x * scale) + 'px';
-  char.style.top  = (pt.y * scale) + 'px';
+  // Leandro — móvel
+  const char = document.getElementById('trail-char');
+  if (!char) return;
+
+  const leandroIdx = unlocked === 0 ? 0 : Math.min(2 * unlocked - 1, N - 2);
+  const leandroT   = (leandroIdx / (N-1)) * total;
+  const leandroPt  = path.getPointAtLength(leandroT);
+
+  // Se Leandro está na mesma posição que Ruy, offset lateral
+  const ruyStepIdx = Math.min(3, STEPS.length - 1);
+  const ruyMarker  = STEPS.length > 0 ? 1 + ruyStepIdx * 2 : -1;
+  const samePos    = leandroIdx === ruyMarker && STEPS.length > 0;
+  const offset     = samePos ? 38 * scale : 0;
+
+  char.style.left = (leandroPt.x * scale + offset) + 'px';
+  char.style.top  = (leandroPt.y * scale) + 'px';
+
+  if (ruy && samePos){
+    const ruyT2  = (ruyMarker / (N-1)) * total;
+    const ruyPt2 = path.getPointAtLength(ruyT2);
+    ruy.style.left = (ruyPt2.x * scale - offset) + 'px';
+    ruy.style.top  = (ruyPt2.y * scale) + 'px';
+  }
 
   if (animate){
     const inner = char.querySelector('.char-inner');
@@ -879,18 +1094,14 @@ async function pullState(){
     if (!r.ok) throw 0;
     const data = await r.json();
     syncLive = true;
-
     let changed = false;
 
     if (data && typeof data === 'object'){
       if (Array.isArray(data.steps) && data.steps.length > 0){
-        const newStepsStr = JSON.stringify(data.steps);
-        if (JSON.stringify(STEPS) !== newStepsStr){
+        const newStr = JSON.stringify(data.steps);
+        if (JSON.stringify(STEPS) !== newStr){
           STEPS = data.steps.map(s => ({ id: s.id, type: s.type||'PDF', title: s.title||'', text: s.text||'' }));
-          CPS = STEPS.map(s => {
-            const existing = CPS.find(c => c.id === s.id);
-            return existing || { id: s.id, name: '', desc: '', link: '' };
-          });
+          CPS   = STEPS.map(s => CPS.find(c => c.id === s.id) || { id: s.id, name:'', desc:'', link:'' });
           changed = true;
         }
       }
@@ -902,14 +1113,10 @@ async function pullState(){
 
       if (data.cps){
         CPS.forEach(cp => {
-          const remote = data.cps[String(cp.id)];
-          if (remote){
-            if (remote.name !== cp.name || remote.desc !== cp.desc || remote.link !== cp.link){
-              cp.name = remote.name || '';
-              cp.desc = remote.desc || '';
-              cp.link = remote.link || '';
-              changed = true;
-            }
+          const rem = data.cps[String(cp.id)];
+          if (rem && (rem.name !== cp.name || rem.desc !== cp.desc || rem.link !== cp.link)){
+            cp.name = rem.name||''; cp.desc = rem.desc||''; cp.link = rem.link||'';
+            changed = true;
           }
         });
       }
@@ -923,15 +1130,13 @@ async function pullState(){
       if (data !== unlocked){ unlocked = data; changed = true; }
     }
 
-    if (changed){ buildTrail(); updateCharacter(true); }
-
+    if (changed){ buildTrail(); updateCharacters(true); }
   } catch(e){ syncLive = false; }
   updateDot();
 }
 
 function updateDot(){
-  const d = document.getElementById('syncDot');
-  if (d) d.classList.toggle('live', syncLive);
+  document.getElementById('syncDot').classList.toggle('on', syncLive);
 }
 
 // ════════════════════════════════════
@@ -940,15 +1145,15 @@ function updateDot(){
 if (!isFB) document.getElementById('fbNotice').classList.add('on');
 
 let resizeTimer;
-window.addEventListener('resize', ()=>{
+window.addEventListener('resize', () => {
   clearTimeout(resizeTimer);
-  resizeTimer = setTimeout(()=>{ buildTrail(); updateCharacter(false); }, 120);
+  resizeTimer = setTimeout(() => { buildTrail(); updateCharacters(false); }, 120);
 });
 
-document.fonts.ready.then(()=>requestAnimationFrame(()=>{
+document.fonts.ready.then(() => requestAnimationFrame(() => {
   checkName();
   buildTrail();
-  initCharacter();
+  initCharacters();
   if (isFB){ pullState(); setInterval(pullState, 3000); }
 }));
 </script>
