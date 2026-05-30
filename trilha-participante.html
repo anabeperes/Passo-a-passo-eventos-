@@ -9,41 +9,72 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>Trilha — Dia 01</title>
+  <title>Trilha — Mergulhando na IA</title>
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --bg:    #0D1117;
-      --bg2:   #161B22;
-      --road:  #1A1E26;
-      --edge:  #252B35;
-      --dash:  #E8B500;
-      --bdr:   #30363D;
-      --text:  #C9D1D9;
-      --muted: #484F58;
-      --acc:   #E8B500;
+      --bg:    #020D14;
+      --bg2:   #041824;
+      --road:  #052840;
+      --edge:  #083858;
+      --dash:  #00C8D4;
+      --bdr:   #0A3D5C;
+      --text:  #C8E8F4;
+      --muted: #2A6080;
+      --acc:   #00C8D4;
+      --glow:  #FF7A20;
       --px:    'Press Start 2P', monospace;
     }
-    body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; padding-bottom: 40px; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      padding-bottom: 40px;
+      overflow-x: hidden;
+    }
+
+    /* ── BOLHAS DE FUNDO ── */
+    .bubble {
+      position: fixed;
+      border-radius: 50%;
+      background: rgba(0, 200, 212, 0.12);
+      border: 1px solid rgba(0, 200, 212, 0.25);
+      pointer-events: none;
+      z-index: 0;
+      animation: bubble-rise linear infinite;
+    }
+    @keyframes bubble-rise {
+      0%   { transform: translateY(0) translateX(0) scale(1); opacity: 0; }
+      10%  { opacity: 1; }
+      90%  { opacity: 0.6; }
+      100% { transform: translateY(-110vh) translateX(20px) scale(1.4); opacity: 0; }
+    }
 
     /* ── HEADER ── */
-    .hdr { background: #010409; border-bottom: 2px solid var(--bdr); padding: 16px 16px 12px; position: sticky; top: 0; z-index: 50; }
+    .hdr {
+      background: #010810;
+      border-bottom: 2px solid var(--bdr);
+      padding: 16px 16px 12px;
+      position: sticky; top: 0; z-index: 50;
+      box-shadow: 0 2px 20px rgba(0,200,212,.12);
+    }
     .hdr-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 10px; }
-    .hdr-title { font-family: var(--px); font-size: 9px; color: #58A6FF; line-height: 1.9; flex: 1; }
+    .hdr-title { font-family: var(--px); font-size: 9px; color: var(--acc); line-height: 1.9; flex: 1; }
     .sync-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); margin-top: 3px; margin-left: 10px; flex-shrink: 0; transition: background .4s; }
-    .sync-dot.live { background: #3FB950; }
-    .prog-bar { height: 6px; background: var(--bdr); overflow: hidden; }
-    .prog-fill { height: 100%; background: var(--acc); transition: width .5s ease; }
+    .sync-dot.live { background: #00E5B0; box-shadow: 0 0 6px #00E5B0; }
+    .prog-bar { height: 6px; background: var(--bdr); overflow: hidden; border-radius: 3px; }
+    .prog-fill { height: 100%; background: linear-gradient(90deg, var(--acc), var(--glow)); transition: width .5s ease; border-radius: 3px; }
     .prog-txt  { font-size: 10px; color: var(--muted); margin-top: 5px; font-family: monospace; }
 
     /* ── NOTICE ── */
-    .notice { background: #1C1A00; border: 1px solid #4A3800; padding: 10px 14px; margin: 12px 16px 0; max-width: 500px; margin-left: auto; margin-right: auto; display: none; }
+    .notice { background: #001A20; border: 1px solid #005060; padding: 10px 14px; margin: 12px 16px 0; max-width: 500px; margin-left: auto; margin-right: auto; display: none; }
     .notice.on { display: block; }
-    .notice-txt { font-family: var(--px); font-size: 7px; color: #A07000; line-height: 1.9; }
+    .notice-txt { font-family: var(--px); font-size: 7px; color: #0090A0; line-height: 1.9; }
 
     /* ── TRAIL ── */
-    .road-wrap { position: relative; max-width: 500px; margin: 0 auto; padding: 12px 0 24px; }
+    .road-wrap { position: relative; max-width: 500px; margin: 0 auto; padding: 12px 0 24px; z-index: 1; }
     #road-svg { display: block; width: 100%; height: auto; }
     #items-layer { position: absolute; top: 12px; left: 0; width: 100%; pointer-events: none; overflow: visible; }
 
@@ -71,9 +102,10 @@
       display: flex; align-items: center; justify-content: center;
       cursor: pointer; transform: translate(-50%,-50%);
       transition: border-color .2s, background .2s;
+      border-radius: 4px;
     }
-    .cp-sq:hover:not(.cp-lock) { border-color: var(--text); background: var(--bg2); }
-    .cp-sq.has-c { border-color: var(--acc); }
+    .cp-sq:hover:not(.cp-lock) { border-color: var(--acc); background: var(--bg2); box-shadow: 0 0 10px rgba(0,200,212,.3); }
+    .cp-sq.has-c { border-color: var(--acc); box-shadow: 0 0 8px rgba(0,200,212,.25); }
     .cp-sq.cp-lock { opacity: .15; cursor: default; pointer-events: none; }
     .cp-ico { font-family: var(--px); font-size: 10px; color: var(--muted); user-select: none; line-height: 1; }
     .cp-sq.has-c .cp-ico { color: var(--acc); }
@@ -81,7 +113,7 @@
     /* ── START / END ── */
     .trail-flag { position: absolute; transform: translate(-50%,-50%); text-align: center; z-index: 6; pointer-events: none; }
     .flag-icon { font-size: 26px; display: block; }
-    .flag-txt  { font-family: var(--px); font-size: 7px; color: var(--acc); display: block; margin-top: 4px; line-height: 1.7; white-space: nowrap; }
+    .flag-txt  { font-family: var(--px); font-size: 7px; color: var(--acc); display: block; margin-top: 4px; line-height: 1.7; white-space: nowrap; text-shadow: 0 0 8px rgba(0,200,212,.6); }
 
     /* ── PERSONAGEM ── */
     #char-layer { position: absolute; top: 12px; left: 0; width: 100%; pointer-events: none; overflow: visible; z-index: 10; }
@@ -92,45 +124,48 @@
     .char-inner {
       transform: translate(-50%, -100%);
       animation: char-bob 1.4s ease-in-out infinite;
-      filter: drop-shadow(0 0 6px #E8B500) drop-shadow(0 2px 4px rgba(0,0,0,.8));
+      filter: drop-shadow(0 0 8px #00C8D4) drop-shadow(0 0 16px rgba(0,200,212,.4)) drop-shadow(0 2px 4px rgba(0,0,0,.9));
     }
     @keyframes char-bob {
       0%, 100% { transform: translate(-50%, -100%); }
-      50%       { transform: translate(-50%, calc(-100% - 5px)); }
+      50%       { transform: translate(-50%, calc(-100% - 6px)); }
     }
     .char-inner.pop { animation: char-pop .35s ease-out, char-bob 1.4s ease-in-out infinite .35s; }
     @keyframes char-pop {
-      0%  { transform: translate(-50%, calc(-100% - 10px)) scale(1.25); }
+      0%  { transform: translate(-50%, calc(-100% - 12px)) scale(1.3); }
       100%{ transform: translate(-50%, -100%) scale(1); }
     }
 
     /* ── BOTTOM SHEET (checkpoint content) ── */
-    .sheet-bg { position: fixed; inset: 0; background: rgba(0,0,0,.7); display: none; z-index: 150; }
+    .sheet-bg { position: fixed; inset: 0; background: rgba(0,5,15,.8); display: none; z-index: 150; backdrop-filter: blur(2px); }
     .sheet-bg.on { display: block; }
     .sheet {
       position: fixed; bottom: 0; left: 0; right: 0;
       background: var(--bg2); border-top: 2px solid var(--acc);
       padding: 20px 18px 34px; max-width: 500px; margin: 0 auto;
       z-index: 160; max-height: 72vh; overflow-y: auto; display: none;
+      box-shadow: 0 -4px 30px rgba(0,200,212,.2);
     }
     .sheet.on { display: block; }
     .sheet-lbl { font-family: var(--px); font-size: 7px; color: var(--acc); display: block; margin-bottom: 14px; line-height: 1.8; padding-right: 40px; }
-    .sheet-desc { font-size: 14px; line-height: 1.75; color: #8B949E; white-space: pre-wrap; }
+    .sheet-desc { font-size: 14px; line-height: 1.75; color: #7AAABB; white-space: pre-wrap; }
     .sheet-desc.empty { color: var(--muted); font-style: italic; font-size: 13px; }
-    .sheet-link { display: inline-flex; align-items: center; gap: 6px; margin-top: 14px; padding: 9px 14px; background: var(--acc); color: #010409; text-decoration: none; font-family: var(--px); font-size: 7px; }
+    .sheet-link { display: inline-flex; align-items: center; gap: 6px; margin-top: 14px; padding: 9px 14px; background: var(--acc); color: #010810; text-decoration: none; font-family: var(--px); font-size: 7px; }
+    .sheet-link:hover { background: var(--glow); }
     .sheet-x { position: absolute; top: 16px; right: 16px; background: transparent; border: 1px solid var(--bdr); color: var(--muted); padding: 5px 9px; font-family: var(--px); font-size: 7px; cursor: pointer; }
+    .sheet-x:hover { border-color: var(--acc); color: var(--acc); }
 
     /* ── FAQ BUTTON ── */
     #faq-btn {
       position: fixed; top: 80px; right: 16px;
-      background: var(--acc); color: #010409;
+      background: var(--acc); color: #010810;
       border: none; cursor: pointer; z-index: 90;
       padding: 10px 12px; text-align: center;
       font-family: var(--px); font-size: 7px; line-height: 1.9;
-      box-shadow: 0 4px 0 #8A6C00;
+      box-shadow: 0 4px 0 #007A80, 0 0 20px rgba(0,200,212,.4);
       transition: transform .1s, box-shadow .1s;
     }
-    #faq-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 #8A6C00; }
+    #faq-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 #007A80; }
     #faq-btn .faq-icon { font-size: 22px; display: block; margin-bottom: 4px; }
 
     /* ── FAQ PANEL ── */
@@ -138,16 +173,17 @@
       position: fixed; top: 190px; right: 16px;
       width: 260px; background: var(--bg2); border: 2px solid var(--acc);
       z-index: 91; display: none;
+      box-shadow: 0 0 20px rgba(0,200,212,.2);
     }
     #faq-panel.on { display: block; }
     .faq-hdr {
-      background: var(--acc); color: #010409;
+      background: var(--acc); color: #010810;
       font-family: var(--px); font-size: 7px;
       padding: 8px 10px; display: flex; align-items: center; justify-content: space-between;
     }
     .faq-close {
       background: transparent; border: none; cursor: pointer;
-      font-size: 14px; color: #010409; line-height: 1; padding: 0 2px;
+      font-size: 14px; color: #010810; line-height: 1; padding: 0 2px;
     }
     .faq-item { border-bottom: 1px solid var(--bdr); }
     .faq-item:last-child { border-bottom: none; }
@@ -161,34 +197,42 @@
     .faq-arrow { flex-shrink: 0; color: var(--acc); font-size: 10px; transition: transform .2s; }
     .faq-item.open .faq-arrow { transform: rotate(90deg); }
     .faq-a {
-      font-size: 14px; color: #8B949E; line-height: 1.7;
+      font-size: 14px; color: #7AAABB; line-height: 1.7;
       padding: 0 12px 12px; display: none; white-space: pre-wrap;
     }
     .faq-item.open .faq-a { display: block; }
 
     /* ── TELA DE OFERTA ── */
-    #oferta-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.92); display: flex; align-items: center; justify-content: center; z-index: 400; padding: 24px; opacity: 0; pointer-events: none; transition: opacity .5s; }
+    #oferta-overlay { position: fixed; inset: 0; background: rgba(0,5,15,.95); display: flex; align-items: center; justify-content: center; z-index: 400; padding: 24px; opacity: 0; pointer-events: none; transition: opacity .5s; }
     #oferta-overlay.on { opacity: 1; pointer-events: auto; }
-    .oferta-box { background: #161B22; border: 3px solid #E8B500; padding: 36px 28px; width: 100%; max-width: 380px; text-align: center; box-shadow: 0 0 40px rgba(232,181,0,.3); }
+    .oferta-box { background: var(--bg2); border: 3px solid var(--acc); padding: 36px 28px; width: 100%; max-width: 380px; text-align: center; box-shadow: 0 0 60px rgba(0,200,212,.35); }
     .oferta-star { font-size: 40px; display: block; margin-bottom: 12px; }
-    .oferta-title { font-family: 'Press Start 2P', monospace; font-size: 10px; color: #E8B500; line-height: 2; margin-bottom: 16px; }
-    .oferta-sub { font-size: 15px; color: #C9D1D9; line-height: 1.7; margin-bottom: 24px; }
+    .oferta-title { font-family: 'Press Start 2P', monospace; font-size: 10px; color: var(--acc); line-height: 2; margin-bottom: 16px; text-shadow: 0 0 12px rgba(0,200,212,.6); }
+    .oferta-sub { font-size: 15px; color: var(--text); line-height: 1.7; margin-bottom: 24px; }
     .oferta-qr { background: #fff; padding: 12px; display: inline-block; margin-bottom: 20px; }
-    .oferta-cta { font-family: 'Press Start 2P', monospace; font-size: 8px; color: #010409; background: #E8B500; padding: 14px 20px; display: inline-block; }
+    .oferta-cta { font-family: 'Press Start 2P', monospace; font-size: 8px; color: #010810; background: var(--acc); padding: 14px 20px; display: inline-block; cursor: pointer; }
+    .oferta-cta:hover { background: var(--glow); }
 
     /* ── TELA DE NOME ── */
-    #name-overlay { position: fixed; inset: 0; background: #0D1117; display: flex; align-items: center; justify-content: center; z-index: 300; padding: 24px; }
+    #name-overlay { position: fixed; inset: 0; background: var(--bg); display: flex; align-items: center; justify-content: center; z-index: 300; padding: 24px; }
     #name-overlay.hidden { display: none; }
-    .name-box { background: #161B22; border: 2px solid #E8B500; padding: 36px 28px; width: 100%; max-width: 340px; text-align: center; }
-    .name-title { font-family: 'Press Start 2P', monospace; font-size: 9px; color: #E8B500; line-height: 2; margin-bottom: 24px; }
-    .name-sub { font-size: 13px; color: #8B949E; margin-bottom: 20px; line-height: 1.6; }
-    .name-input { width: 100%; background: #0D1117; border: 2px solid #30363D; color: #C9D1D9; padding: 12px; font-size: 16px; outline: none; text-align: center; margin-bottom: 16px; }
-    .name-input:focus { border-color: #E8B500; }
-    .name-btn { width: 100%; padding: 14px; background: #E8B500; color: #010409; border: none; font-family: 'Press Start 2P', monospace; font-size: 9px; cursor: pointer; }
-    .name-btn:hover { opacity: .88; }
+    .name-box { background: var(--bg2); border: 2px solid var(--acc); padding: 36px 28px; width: 100%; max-width: 340px; text-align: center; box-shadow: 0 0 40px rgba(0,200,212,.25); }
+    .name-title { font-family: 'Press Start 2P', monospace; font-size: 9px; color: var(--acc); line-height: 2; margin-bottom: 24px; }
+    .name-sub { font-size: 13px; color: #7AAABB; margin-bottom: 20px; line-height: 1.6; }
+    .name-input { width: 100%; background: var(--bg); border: 2px solid var(--bdr); color: var(--text); padding: 12px; font-size: 16px; outline: none; text-align: center; margin-bottom: 16px; }
+    .name-input:focus { border-color: var(--acc); box-shadow: 0 0 10px rgba(0,200,212,.2); }
+    .name-btn { width: 100%; padding: 14px; background: var(--acc); color: #010810; border: none; font-family: 'Press Start 2P', monospace; font-size: 9px; cursor: pointer; }
+    .name-btn:hover { background: var(--glow); }
 
     /* ── SAUDAÇÃO NO HEADER ── */
-    .hdr-name { font-family: 'Press Start 2P', monospace; font-size: 7px; color: #E8B500; margin-top: 6px; }
+    .hdr-name { font-family: 'Press Start 2P', monospace; font-size: 7px; color: var(--acc); margin-top: 6px; text-shadow: 0 0 8px rgba(0,200,212,.5); }
+
+    /* ── DECORAÇÃO OCEÂNICA DO FUNDO ── */
+    .ocean-decor {
+      position: fixed; bottom: 0; left: 0; right: 0; height: 80px;
+      background: linear-gradient(to top, rgba(0,40,60,.4), transparent);
+      pointer-events: none; z-index: 0;
+    }
   </style>
 </head>
 <body>
@@ -230,16 +274,16 @@
 <!-- TELA DE NOME -->
 <div id="name-overlay">
   <div class="name-box">
-    <div class="name-title">👋 OLÁ!<br>QUAL É O SEU NOME?</div>
-    <p class="name-sub">Para personalizar sua trilha</p>
+    <div class="name-title">🌊 OLÁ!<br>QUAL É O SEU NOME?</div>
+    <p class="name-sub">Para personalizar sua trilha submarina</p>
     <input class="name-input" type="text" id="nameInput" placeholder="Seu nome..." maxlength="30" autocomplete="off">
-    <button class="name-btn" onclick="saveName()">ENTRAR →</button>
+    <button class="name-btn" onclick="saveName()">MERGULHAR →</button>
   </div>
 </div>
 
 <!-- FAQ BUTTON -->
 <button id="faq-btn" onclick="toggleFaq()">
-  <span class="faq-icon">📖</span>ME PERDI,<br>E AGORA?
+  <span class="faq-icon">🐠</span>ME PERDI,<br>E AGORA?
 </button>
 
 <!-- FAQ PANEL -->
@@ -254,7 +298,7 @@
 <!-- HEADER -->
 <div class="hdr">
   <div class="hdr-top">
-    <div class="hdr-title" id="hdrTitle">TRILHA — DIA 01</div>
+    <div class="hdr-title" id="hdrTitle">🌊 MERGULHANDO NA IA</div>
     <div class="sync-dot" id="syncDot"></div>
   </div>
   <div class="prog-bar"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
@@ -270,6 +314,13 @@
 <!-- TRAIL -->
 <div class="road-wrap" id="roadWrap">
   <svg id="road-svg" viewBox="0 0 360 1300" xmlns="http://www.w3.org/2000/svg">
+    <!-- fundo gradiente oceânico atrás da estrada -->
+    <defs>
+      <linearGradient id="oceanGrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#020D14"/>
+        <stop offset="100%" stop-color="#020D14"/>
+      </linearGradient>
+    </defs>
     <path id="road-path"
       d="M 60 60 L 280 60
          A 55 80 0 0 1 280 220
@@ -286,7 +337,7 @@
          L 280 1020
          A 55 80 0 0 1 280 1180
          L 60 1180"
-      stroke="#252B35" stroke-width="56" fill="none" stroke-linecap="round"/>
+      stroke="#083858" stroke-width="56" fill="none" stroke-linecap="round"/>
     <path
       d="M 60 60 L 280 60
          A 55 80 0 0 1 280 220
@@ -303,7 +354,7 @@
          L 280 1020
          A 55 80 0 0 1 280 1180
          L 60 1180"
-      stroke="#1A1E26" stroke-width="50" fill="none" stroke-linecap="round"/>
+      stroke="#052840" stroke-width="50" fill="none" stroke-linecap="round"/>
     <path
       d="M 60 60 L 280 60
          A 55 80 0 0 1 280 220
@@ -320,8 +371,8 @@
          L 280 1020
          A 55 80 0 0 1 280 1180
          L 60 1180"
-      stroke="#E8B500" stroke-width="2.5" fill="none"
-      stroke-dasharray="14 14" stroke-linecap="butt"/>
+      stroke="#00C8D4" stroke-width="2" fill="none"
+      stroke-dasharray="14 14" stroke-linecap="butt" opacity="0.7"/>
   </svg>
   <div id="items-layer"></div>
   <div id="char-layer"></div>
@@ -336,18 +387,42 @@
   <a id="sheetLink" href="#" target="_blank" class="sheet-link" style="display:none">ACESSAR →</a>
 </div>
 
+<!-- decoração de fundo -->
+<div class="ocean-decor"></div>
+
 <script>
+// ════════════════════════════════════
+//  BOLHAS DECORATIVAS
+// ════════════════════════════════════
+function spawnBubbles(){
+  const count = 12;
+  for (let i = 0; i < count; i++){
+    const b = document.createElement('div');
+    b.className = 'bubble';
+    const size = 4 + Math.random() * 12;
+    b.style.cssText = [
+      `width:${size}px`, `height:${size}px`,
+      `left:${Math.random()*100}%`,
+      `bottom:${Math.random()*30}%`,
+      `animation-duration:${6 + Math.random()*10}s`,
+      `animation-delay:${Math.random()*8}s`
+    ].join(';');
+    document.body.appendChild(b);
+  }
+}
+spawnBubbles();
+
 // ════════════════════════════════════
 //  FAQ
 // ════════════════════════════════════
 const FAQ_ITEMS = [
   {
     q: "Me perdi, onde ele está agora?",
-    a: "Clique no bonequinho na trilha e descubra onde estamos."
+    a: "Clique no caranguejo na trilha e descubra onde estamos."
   },
   {
     q: "Onde está o link dos materiais?",
-    a: 'O link dos materiais está aqui: <a href="http://vtsd.com.br/materiais-ia" target="_blank" style="color:#E8B500;text-decoration:underline">vtsd.com.br/materiais-ia</a>'
+    a: 'O link dos materiais está aqui: <a href="http://vtsd.com.br/materiais-ia" target="_blank" style="color:#00C8D4;text-decoration:underline">vtsd.com.br/materiais-ia</a>'
   },
   {
     q: "A trilha não atualiza, o que faço?",
@@ -407,7 +482,7 @@ function saveName(){
 
 function applyName(name){
   const el = document.getElementById('hdrName');
-  if (el) el.textContent = `OI, ${name.toUpperCase()}! 👋`;
+  if (el) el.textContent = `🌊 OI, ${name.toUpperCase()}!`;
 }
 
 // ════════════════════════════════════
@@ -434,7 +509,7 @@ function playStepSound(){
 //  ⚙ CONFIGURAÇÃO
 // ════════════════════════════════════
 const CFG = {
-  title:    "TRILHA — DIA 01: PREPARAÇÃO",
+  title:    "🌊 MERGULHANDO NA IA — DIA 01",
   firebase: {
     url:  "https://passo-a-passo-eventos-default-rtdb.firebaseio.com",
     path: "/trilha.json"
@@ -444,32 +519,30 @@ const CFG = {
 // ════════════════════════════════════
 //  ETAPAS — carregadas do Firebase
 // ════════════════════════════════════
-let STEPS = []; // preenchido via pullState()
-
-// Checkpoint content — reconstruído quando STEPS muda
+let STEPS = [];
 let CPS = [];
-
-// Title overrides (sincronizados do Firebase via admin)
 let TITLES = {};
 function getTitle(id){
   return TITLES[id] !== undefined ? TITLES[id] : (STEPS.find(s=>s.id===id)||{}).title||'';
 }
 
 // ════════════════════════════════════
-//  TYPE COLOURS
+//  TYPE COLOURS — paleta oceânica
 // ════════════════════════════════════
 const TC = {
-  PDF:      { c:"#FF7B72", bg:"#3D1212" },
-  Aula:     { c:"#79C0FF", bg:"#0A1E3D" },
-  Doc:      { c:"#56D364", bg:"#0A2D14" },
-  Site:     { c:"#BC8CFF", bg:"#1A0A3D" },
-  Skill:    { c:"#FFA657", bg:"#3D1E00" },
-  Planilha: { c:"#39D4C5", bg:"#002D2A" },
-  Prompt:   { c:"#F778BA", bg:"#3D0A22" },
+  PDF:      { c:"#FF7B72", bg:"#200A0A" },
+  Aula:     { c:"#00C8D4", bg:"#00262A" },
+  Doc:      { c:"#56D364", bg:"#082010" },
+  Site:     { c:"#7ECFFF", bg:"#001830" },
+  Skill:    { c:"#FF9A50", bg:"#201000" },
+  Planilha: { c:"#39D4C5", bg:"#002020" },
+  Prompt:   { c:"#F778BA", bg:"#200818" },
 };
+
+// emojis temáticos oceânico/IA
 const TE = {
-  PDF:'🚩', Aula:'🚩', Doc:'🚩', Site:'🚩',
-  Skill:'🚩', Planilha:'🚩', Prompt:'🚩',
+  PDF:'🐚', Aula:'🐬', Doc:'🐠', Site:'🦑',
+  Skill:'🦀', Planilha:'🐙', Prompt:'⚓',
 };
 
 // ════════════════════════════════════
@@ -510,7 +583,7 @@ function buildTrail(){
     document.getElementById('progFill').style.width = '0%';
     document.getElementById('progTxt').textContent  = 'Aguardando configuração...';
     document.getElementById('items-layer').innerHTML =
-      `<div style="position:absolute;top:40px;left:50%;transform:translateX(-50%);font-family:'Press Start 2P',monospace;font-size:7px;color:#484F58;text-align:center;line-height:2.5;white-space:nowrap">AGUARDANDO<br>CONFIGURAÇÃO...</div>`;
+      `<div style="position:absolute;top:40px;left:50%;transform:translateX(-50%);font-family:'Press Start 2P',monospace;font-size:7px;color:#2A6080;text-align:center;line-height:2.5;white-space:nowrap">🌊 AGUARDANDO<br>CONFIGURAÇÃO...</div>`;
     return;
   }
 
@@ -523,8 +596,6 @@ function buildTrail(){
   const scale = getScale();
   layer.innerHTML = '';
 
-  // Usamos N+2 pontos: posição 0 = INÍCIO, posição N+1 = CHEGADA,
-  // posições 1..N = stops e checkpoints intercalados, SEM parada no INÍCIO.
   const N = STEPS.length * 2 + 1;
 
   for (let i = 0; i < N; i++){
@@ -534,33 +605,31 @@ function buildTrail(){
     const sy   = pt.y * scale;
 
     if (i === 0){
-      // Só texto INÍCIO — sem dot nem emoji
       const el = mk('div','trail-flag');
       el.style.cssText = `left:${sx}px;top:${sy}px`;
-      el.innerHTML = `<span class="flag-txt">INÍCIO</span>`;
+      el.innerHTML = `<span class="flag-txt">🌊 INÍCIO</span>`;
       layer.appendChild(el);
 
     } else if (i === N-1){
       const done = unlocked >= STEPS.length;
       const el   = mk('div','trail-flag');
       el.style.cssText = `left:${sx}px;top:${sy}px;opacity:${done?1:.3}`;
-      el.innerHTML = `<span class="flag-icon">${done?'🏆':'🏁'}</span><span class="flag-txt">${done?'CONCLUÍDO!':'CHEGADA'}</span>`;
+      el.innerHTML = `<span class="flag-icon">${done?'🏆':'🎯'}</span><span class="flag-txt">${done?'MISSÃO CUMPRIDA!':'CHEGADA'}</span>`;
       layer.appendChild(el);
 
     } else if (i % 2 === 1){
-      // ── STOP — posicionado no centro da estrada ──
       const si   = Math.floor(i/2);
       const s    = STEPS[si];
-      const t2   = TC[s.type] || {c:'#999',bg:'#222'};
+      const t2   = TC[s.type] || {c:'#00C8D4',bg:'#002020'};
       const isOn = si < unlocked;
 
       const dot = mk('div', 'stop-dot' + (isOn ? '' : ' off'));
-      dot.style.cssText = `left:${sx}px;top:${sy}px;${isOn?'background:'+t2.c:''}`;
+      dot.style.cssText = `left:${sx}px;top:${sy}px;${isOn?'background:'+t2.c+';box-shadow:0 0 8px '+t2.c:''}`;
       layer.appendChild(dot);
 
       const emoji = mk('div', 'stop-emoji');
       emoji.style.cssText = `left:${sx}px;top:${sy}px`;
-      emoji.textContent = TE[s.type] || '📌';
+      emoji.textContent = TE[s.type] || '🐚';
       emoji.addEventListener('click', () => {
         if (isOn) openStepSheet(s.id);
         else openLockedMsg();
@@ -568,17 +637,15 @@ function buildTrail(){
       layer.appendChild(emoji);
 
     } else {
-      // ── CHECKPOINT ──
       const cpId   = i / 2;
       const cp     = CPS.find(c=>c.id===cpId) || {desc:'',link:''};
       const locked = unlocked < cpId;
 
-      // só exibe o checkpoint se tiver conteúdo preenchido
       if (cp.desc){
         const wrap = mk('div','cp-item');
         wrap.style.cssText = `left:${sx}px;top:${sy}px`;
         const sq = mk('div',`cp-sq${locked?' cp-lock':' has-c'}`);
-        sq.innerHTML = `<span class="cp-ico">▼</span>`;
+        sq.innerHTML = `<span class="cp-ico">🌀</span>`;
         if (!locked) sq.addEventListener('click', ()=>openSheet(cpId));
         wrap.appendChild(sq);
         layer.appendChild(wrap);
@@ -603,7 +670,7 @@ function openSheet(cpId){
 
   const cpLabel = cp.name || (s ? s.title : '');
   document.getElementById('sheetLbl').textContent =
-    `▶ CP ${String(cpId).padStart(2,'0')} — ${cpLabel.toUpperCase()}`;
+    `🌀 CP ${String(cpId).padStart(2,'0')} — ${cpLabel.toUpperCase()}`;
 
   const d = document.getElementById('sheetDesc');
   d.className = cp.desc ? 'sheet-desc' : 'sheet-desc empty';
@@ -620,11 +687,11 @@ function openSheet(cpId){
 function openStepSheet(stepId){
   const s = STEPS.find(x => x.id === stepId);
   if (!s) return;
-  const t = TC[s.type] || {c:'#999',bg:'#222'};
+  const t = TC[s.type] || {c:'#00C8D4',bg:'#002020'};
   activeSheet = null;
 
   document.getElementById('sheetLbl').innerHTML =
-    `<span style="background:${t.bg};color:${t.c};padding:2px 6px;font-size:5px">${s.type.toUpperCase()}</span>  ${esc(getTitle(stepId))}`;
+    `<span style="background:${t.bg};color:${t.c};padding:2px 6px;font-size:5px;border:1px solid ${t.c}">${s.type.toUpperCase()}</span>  ${esc(getTitle(stepId))}`;
 
   const d = document.getElementById('sheetDesc');
   d.className = 'sheet-desc';
@@ -643,40 +710,78 @@ function closeSheet(){
 
 function openLockedMsg(){
   activeSheet = null;
-  document.getElementById('sheetLbl').textContent = '🔒 ETAPA BLOQUEADA';
+  document.getElementById('sheetLbl').textContent = '🔒 ZONA BLOQUEADA';
   const d = document.getElementById('sheetDesc');
   d.className = 'sheet-desc';
-  d.textContent = 'Calma, não chegamos aqui ainda!';
+  d.textContent = 'Ainda não chegamos aqui. Aguarda, o mergulho continua!';
   document.getElementById('sheetLink').style.display = 'none';
   document.getElementById('sheetBg').classList.add('on');
   document.getElementById('sheet').classList.add('on');
 }
 
 // ════════════════════════════════════
-//  PERSONAGEM PIXEL ART
+//  PERSONAGEM — CARANGUEJO PIXEL ART
+//  (inspirado no Leandro das imagens)
 // ════════════════════════════════════
 const CHAR_SVG = `
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 24" width="40" height="60" shape-rendering="crispEdges">
-  <rect x="4" y="0" width="8" height="2" fill="#5C3217"/>
-  <rect x="3" y="1" width="10" height="4" fill="#5C3217"/>
-  <rect x="2" y="2" width="2" height="4" fill="#5C3217"/>
-  <rect x="12" y="2" width="2" height="4" fill="#5C3217"/>
-  <rect x="3" y="3" width="10" height="6" fill="#F5C09A"/>
-  <rect x="4" y="5" width="2" height="2" fill="#1A1A2E"/>
-  <rect x="10" y="5" width="2" height="2" fill="#1A1A2E"/>
-  <rect x="6" y="8" width="4" height="1" fill="#C47A5A"/>
-  <rect x="6" y="9" width="4" height="1" fill="#F5C09A"/>
-  <rect x="3" y="10" width="10" height="7" fill="#2EAD4B"/>
-  <rect x="7" y="10" width="2" height="4" fill="#249040"/>
-  <rect x="1" y="10" width="2" height="6" fill="#2EAD4B"/>
-  <rect x="13" y="10" width="2" height="6" fill="#2EAD4B"/>
-  <rect x="1" y="16" width="2" height="2" fill="#F5C09A"/>
-  <rect x="13" y="16" width="2" height="2" fill="#F5C09A"/>
-  <rect x="4" y="17" width="3" height="5" fill="#1E3A8A"/>
-  <rect x="9" y="17" width="3" height="5" fill="#1E3A8A"/>
-  <rect x="3" y="17" width="10" height="1" fill="#0D2040"/>
-  <rect x="3" y="22" width="4" height="2" fill="#111"/>
-  <rect x="9" y="22" width="4" height="2" fill="#111"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 28" width="64" height="56" shape-rendering="crispEdges">
+  <!-- pernas traseiras esquerdas -->
+  <rect x="5" y="19" width="2" height="6" fill="#B02800"/>
+  <rect x="3" y="24" width="4" height="1" fill="#901800"/>
+  <!-- pernas traseiras direitas -->
+  <rect x="25" y="19" width="2" height="6" fill="#B02800"/>
+  <rect x="25" y="24" width="4" height="1" fill="#901800"/>
+  <!-- pernas dianteiras esquerdas -->
+  <rect x="7" y="18" width="2" height="5" fill="#B02800"/>
+  <rect x="6" y="22" width="3" height="1" fill="#901800"/>
+  <!-- pernas dianteiras direitas -->
+  <rect x="23" y="18" width="2" height="5" fill="#B02800"/>
+  <rect x="23" y="22" width="3" height="1" fill="#901800"/>
+  <!-- garra esquerda -->
+  <rect x="0" y="7" width="6" height="5" fill="#CC3000"/>
+  <rect x="0" y="6" width="4" height="3" fill="#DD4000"/>
+  <rect x="2" y="11" width="4" height="2" fill="#AA2000"/>
+  <!-- garra direita -->
+  <rect x="26" y="7" width="6" height="5" fill="#CC3000"/>
+  <rect x="28" y="6" width="4" height="3" fill="#DD4000"/>
+  <rect x="26" y="11" width="4" height="2" fill="#AA2000"/>
+  <!-- corpo principal -->
+  <rect x="6" y="8" width="20" height="12" fill="#CC3000"/>
+  <!-- carapaça -->
+  <rect x="8" y="9" width="16" height="9" fill="#DD4000"/>
+  <rect x="10" y="10" width="12" height="6" fill="#EE5000"/>
+  <!-- nervura central -->
+  <rect x="15" y="9" width="2" height="9" fill="#CC3000"/>
+  <!-- nervuras horizontais -->
+  <rect x="8" y="12" width="16" height="1" fill="#BB2800"/>
+  <!-- barriga -->
+  <rect x="10" y="17" width="12" height="3" fill="#BB2800"/>
+  <!-- stalks dos olhos -->
+  <rect x="10" y="3" width="3" height="6" fill="#CC3000"/>
+  <rect x="19" y="3" width="3" height="6" fill="#CC3000"/>
+  <!-- olhos -->
+  <rect x="9" y="2" width="5" height="4" fill="#111"/>
+  <rect x="18" y="2" width="5" height="4" fill="#111"/>
+  <rect x="9" y="2" width="2" height="2" fill="#FFF"/>
+  <rect x="20" y="2" width="2" height="2" fill="#FFF"/>
+  <rect x="10" y="2" width="1" height="1" fill="#000"/>
+  <rect x="21" y="2" width="1" height="1" fill="#000"/>
+  <!-- armação dos óculos esquerda -->
+  <rect x="8" y="4" width="7" height="1" fill="#222"/>
+  <rect x="8" y="7" width="7" height="1" fill="#222"/>
+  <rect x="8" y="4" width="1" height="4" fill="#222"/>
+  <rect x="14" y="4" width="1" height="4" fill="#222"/>
+  <!-- armação dos óculos direita -->
+  <rect x="17" y="4" width="7" height="1" fill="#222"/>
+  <rect x="17" y="7" width="7" height="1" fill="#222"/>
+  <rect x="17" y="4" width="1" height="4" fill="#222"/>
+  <rect x="23" y="4" width="1" height="4" fill="#222"/>
+  <!-- ponte dos óculos -->
+  <rect x="15" y="5" width="2" height="1" fill="#222"/>
+  <!-- barba -->
+  <rect x="11" y="18" width="10" height="2" fill="#2A1400"/>
+  <rect x="10" y="19" width="12" height="2" fill="#3A1E00"/>
+  <rect x="11" y="21" width="10" height="1" fill="#2A1000"/>
 </svg>`;
 
 function initCharacter(){
@@ -691,7 +796,7 @@ function initCharacter(){
     if (STEPS.length === 0) return;
     if (unlocked === 0) {
       activeSheet = null;
-      document.getElementById('sheetLbl').textContent = '🚀 PREPARADOS?';
+      document.getElementById('sheetLbl').textContent = '🌊 PRONTOS PARA MERGULHAR?';
       const d = document.getElementById('sheetDesc');
       d.className = 'sheet-desc';
       d.textContent = 'Vamos começar já!';
@@ -704,7 +809,21 @@ function initCharacter(){
     }
   });
   const label = document.createElement('div');
-  label.style.cssText = 'position:absolute;top:-80px;left:50%;transform:translateX(-50%);background:#E8B500;color:#010409;font-family:\'Press Start 2P\',monospace;font-size:6px;padding:3px 6px;white-space:nowrap;pointer-events:none;z-index:11;';
+  label.style.cssText = [
+    'position:absolute',
+    'top:-72px',
+    'left:50%',
+    'transform:translateX(-50%)',
+    'background:#00C8D4',
+    'color:#010810',
+    "font-family:'Press Start 2P',monospace",
+    'font-size:6px',
+    'padding:3px 6px',
+    'white-space:nowrap',
+    'pointer-events:none',
+    'z-index:11',
+    'box-shadow:0 0 10px rgba(0,200,212,.5)'
+  ].join(';');
   label.textContent = 'LEANDRO';
   const inner = document.createElement('div');
   inner.className = 'char-inner';
@@ -752,7 +871,6 @@ async function pullState(){
     let changed = false;
 
     if (data && typeof data === 'object'){
-      // Load steps
       if (Array.isArray(data.steps) && data.steps.length > 0){
         const newStepsStr = JSON.stringify(data.steps);
         if (JSON.stringify(STEPS) !== newStepsStr){
@@ -790,7 +908,6 @@ async function pullState(){
         });
       }
     } else if (typeof data === 'number'){
-      // suporte ao formato antigo
       if (data !== unlocked){ unlocked = data; changed = true; }
     }
 
