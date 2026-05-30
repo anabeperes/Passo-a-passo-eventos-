@@ -74,8 +74,8 @@
     .notice-txt { font-family: var(--px); font-size: 7px; color: #0090A0; line-height: 1.9; }
 
     /* ── TRAIL ── */
-    .road-wrap { position: relative; max-width: 500px; margin: 0 auto; padding: 12px 0 24px; z-index: 1; }
-    #road-svg { display: block; width: 100%; height: auto; }
+    .road-wrap { position: relative; max-width: 500px; margin: 0 auto; padding: 12px 0 24px; z-index: 1; overflow: visible; }
+    #road-svg { display: block; width: 100%; height: auto; overflow: visible; }
     #items-layer { position: absolute; top: 12px; left: 0; width: 100%; pointer-events: none; overflow: visible; }
 
     /* ── STOP MARKER ── */
@@ -313,7 +313,7 @@
 
 <!-- TRAIL -->
 <div class="road-wrap" id="roadWrap">
-  <svg id="road-svg" viewBox="0 0 360 1300" xmlns="http://www.w3.org/2000/svg">
+  <svg id="road-svg" viewBox="-32 -32 424 1364" xmlns="http://www.w3.org/2000/svg">
     <!-- fundo gradiente oceânico atrás da estrada -->
     <defs>
       <linearGradient id="oceanGrad" x1="0" y1="0" x2="0" y2="1">
